@@ -9,7 +9,7 @@ const initialState = {
 export const mainSlice = createSlice({
   name: 'main',
   initialState,
-  reducer: {
+  reducers: {
     setOrigin: (state, action) => {
       state.origin = action.payload;
     },
