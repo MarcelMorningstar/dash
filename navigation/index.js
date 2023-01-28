@@ -5,6 +5,8 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 
 import { Ionicons, FontAwesome5, Feather } from '@expo/vector-icons';
 
+import SplashScreen from '../screens/SplashScreen';
+import LoginScreen from '../screens/LoginScreen';
 import HomeScreen from '../screens/HomeScreen';
 import HistoryScreen from '../screens/HistoryScreen';
 import PaymentScreen from '../screens/PaymentScreen';
@@ -13,28 +15,29 @@ import SettingsScreen from '../screens/SettingsScreen';
 
 import * as Location from 'expo-location';
 
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { setOrigin } from '../slices/mainSlice';
+import { selectIsLoading, selectUserToken } from '../slices/authSlice';
 
 export default function Navigation() {
   const dispatch = useDispatch()
-  const [errorMsg, setErrorMsg] = useState(null);
+  const [errorMsg, setErrorMsg] = useState(null)
 
   useEffect(() => {
     (async () => {
       
-      let { status } = await Location.requestForegroundPermissionsAsync();
+      let { status } = await Location.requestForegroundPermissionsAsync()
 
       if (status !== 'granted') {
-        setErrorMsg('Permission to access location was denied');
-        return;
+        setErrorMsg('Permission to access location was denied')
+        return
       }
 
-      let location = await Location.getCurrentPositionAsync({});
+      let location = await Location.getCurrentPositionAsync({})
 
       dispatch(setOrigin(location))
-    })();
-  }, []);
+    })()
+  }, [])
 
   return (
     <NavigationContainer>
@@ -43,18 +46,32 @@ export default function Navigation() {
   )
 }
 
-const Stack = createNativeStackNavigator();
+const Stack = createNativeStackNavigator()
 
 function RootNavigator() {
+  const isLoading = useSelector(selectIsLoading)
+  const userToken = useSelector(selectUserToken)
+
+  if (isLoading) {
+    return <SplashScreen />
+  }
+
   return (
     <Stack.Navigator>
-      <Stack.Screen name="Root" component={BottomTabNavigator} options={{ headerShown: false }} />
+      {
+        userToken == null ? (
+          <Stack.Screen name="SignIn" component={LoginScreen} options={{ headerShown: false }} />
+        ) : (
+          <Stack.Screen name="Root" component={BottomTabNavigator} options={{ headerShown: false }} />
+        )
+      }
+      
       {/* <Stack.Screen name="NotFound" component={NotFoundScreen} options={{ title: 'Oops!' }} /> */}
     </Stack.Navigator>
-  );
+  )
 }
 
-const BottomTab = createBottomTabNavigator();
+const BottomTab = createBottomTabNavigator()
 
 function BottomTabNavigator() {
   return (
@@ -100,5 +117,5 @@ function BottomTabNavigator() {
         }}
       /> 
     </BottomTab.Navigator>
-  );
+  )
 }
