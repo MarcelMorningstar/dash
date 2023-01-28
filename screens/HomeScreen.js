@@ -1,20 +1,18 @@
 import React, { useEffect, useState } from 'react'
 import { StyleSheet, Text, TouchableHighlight, View } from 'react-native'
+import MapView, { PROVIDER_GOOGLE } from 'react-native-maps'
+
 import { useSelector } from 'react-redux'
 import { selectOrigin } from '../slices/mainSlice'
-import MapView, { PROVIDER_GOOGLE } from 'react-native-maps'
 
 export default function HomeScreen() {
   const [loading, setLoading] = useState(true)
-
   const origin = useSelector(selectOrigin)
 
   useEffect(() => {
     if (origin) {
       setLoading(false)
     }
-
-    console.log(origin)
   }, [origin])
 
   if (loading) {
