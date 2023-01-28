@@ -43,7 +43,7 @@ function BottomTabNavigator() {
         name="History"
         component={HistoryScreen}
         options={{
-          tabBarIcon: ({ color }) => <FontAwesome5 name="history" color={color} size={30} style={{ marginBottom: -3 }} />,
+          tabBarIcon: ({ color }) => <FontAwesome5 name="history" color={color} size={24} style={{ marginBottom: -3 }} />,
         }}
       />
       <BottomTab.Screen
