@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { StyleSheet, Text, TouchableHighlight, View } from 'react-native'
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import MapView, { PROVIDER_GOOGLE } from 'react-native-maps'
 
 import { useSelector } from 'react-redux'
@@ -19,8 +20,15 @@ export default function HomeScreen() {
     return <Text>Loading...</Text>
   }
 
+  const insets = useSafeAreaInsets();
+
   return (
-    <View style={styles.container}>
+    <View 
+      style={{
+        flex: 1,
+        paddingTop: insets.top + 2,
+      }}
+    >
       <MapView
         initialRegion={{
           latitude: origin.coords.latitude,
@@ -31,7 +39,9 @@ export default function HomeScreen() {
         provider={PROVIDER_GOOGLE}
         showsUserLocation
         mapType='mutedStandard'
-        style={styles.map}
+        style={{
+          flex: 1,
+        }}
       >
 
       </MapView>
@@ -46,9 +56,6 @@ export default function HomeScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1
-  },
   map: {
     flex: 1
   },
