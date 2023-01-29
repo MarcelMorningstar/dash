@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { StyleSheet, Text, View } from 'react-native'
 
 import * as Location from 'expo-location';
@@ -10,18 +10,21 @@ import { setIsLoading, setUserToken } from '../slices/authSlice';
 import { getAuth, onAuthStateChanged } from "firebase/auth"
 import app from '../firebase'
 
+const auth = getAuth(app)
+
 export default function SplashScreen() {
+  const [isLocated, setIsLocated] = useState(false)
+  const [isAuth, setIsAuth] = useState(false)
   const dispatch = useDispatch()
-  const auth = getAuth(app)
 
   onAuthStateChanged(auth, (user) => {
     if (user) {
-      dispatch(setIsLoading(false))
       dispatch(setUserToken(user.uid))
     } else {
-      dispatch(setIsLoading(false))
       dispatch(setUserToken(null))
     }
+
+    setIsAuth(true)
   });
 
   useEffect(() => {
@@ -36,9 +39,17 @@ export default function SplashScreen() {
       let location = await Location.getCurrentPositionAsync({})
 
       dispatch(setOrigin(location))
+
+      setIsLocated(true)
     })()
   }, [])
 
+  useEffect(() => {
+    if (isLocated && isAuth) {
+      dispatch(setIsLoading(false))
+    }
+  }, [isLocated, isAuth])
+  
   return (
     <View style={styles.container}>
       <Text>SplashScreen</Text>
