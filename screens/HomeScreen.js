@@ -9,6 +9,7 @@ import { selectOrigin } from '../slices/mainSlice'
 export default function HomeScreen() {
   const [loading, setLoading] = useState(true)
   const origin = useSelector(selectOrigin)
+  const insets = useSafeAreaInsets();
 
   useEffect(() => {
     if (origin) {
@@ -20,15 +21,8 @@ export default function HomeScreen() {
     return <Text>Loading...</Text>
   }
 
-  const insets = useSafeAreaInsets();
-
   return (
-    <View 
-      style={{
-        flex: 1,
-        paddingTop: insets.top + 2,
-      }}
-    >
+    <View style={styles.map}>
       <MapView
         initialRegion={{
           latitude: origin.coords.latitude,
@@ -39,9 +33,10 @@ export default function HomeScreen() {
         provider={PROVIDER_GOOGLE}
         showsUserLocation
         mapType='mutedStandard'
-        style={{
-          flex: 1,
+        mapPadding={{
+          top: insets.top
         }}
+        style={styles.map}
       >
 
       </MapView>
