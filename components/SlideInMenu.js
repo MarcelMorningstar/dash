@@ -75,10 +75,10 @@ export default function SlideInMenu({children, open, setOpen, title}) {
       >
         <View style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
           <TouchableWithoutFeedback onPress={handleClose}>
-            <Ionicons name="close" size={36} color="black" />
+            <Ionicons name="close" size={32} style={{ marginBottom: -1 }} color="black" />
           </TouchableWithoutFeedback>
           
-          <Text style={{ fontSize: 21, fontWeight: '600' }}>{title}</Text>
+          <Text style={{ marginLeft: 4, fontSize: 21, fontWeight: '600' }}>{title}</Text>
         </View>
 
         <View style={{ paddingHorizontal: 12, paddingTop: 8 }}>
