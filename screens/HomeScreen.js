@@ -3,10 +3,13 @@ import { StyleSheet, Text, TouchableHighlight, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import MapView, { PROVIDER_GOOGLE } from 'react-native-maps'
 
+import SlideInMenu from '../components/SlideInMenu'
+
 import { useSelector } from 'react-redux'
 import { selectOrigin } from '../slices/mainSlice'
 
 export default function HomeScreen() {
+  const [destinationMenu, setDestinationMenu] = useState(false)
   const [loading, setLoading] = useState(true)
   const origin = useSelector(selectOrigin)
   const insets = useSafeAreaInsets();
@@ -42,10 +45,14 @@ export default function HomeScreen() {
       </MapView>
 
       <View style={styles.inputContainer}>
-        <TouchableHighlight style={styles.inputField}>
+        <TouchableHighlight style={styles.inputField} onPress={ () => setDestinationMenu(true) }>
           <Text style={styles.text}>Destination</Text>
         </TouchableHighlight>
       </View>
+
+      <SlideInMenu title='Your ride' open={destinationMenu} setOpen={setDestinationMenu}>
+        <Text>Hello</Text>
+      </SlideInMenu>
     </View>
   )
 }
