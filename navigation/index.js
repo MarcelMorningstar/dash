@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
@@ -13,32 +13,10 @@ import PaymentScreen from '../screens/PaymentScreen';
 import ProfileScreen from '../screens/ProfileScreen';
 import SettingsScreen from '../screens/SettingsScreen';
 
-import * as Location from 'expo-location';
-
-import { useDispatch, useSelector } from 'react-redux';
-import { setOrigin } from '../slices/mainSlice';
+import { useSelector } from 'react-redux';
 import { selectIsLoading, selectUserToken } from '../slices/authSlice';
 
 export default function Navigation() {
-  const dispatch = useDispatch()
-  const [errorMsg, setErrorMsg] = useState(null)
-
-  useEffect(() => {
-    (async () => {
-      
-      let { status } = await Location.requestForegroundPermissionsAsync()
-
-      if (status !== 'granted') {
-        setErrorMsg('Permission to access location was denied')
-        return
-      }
-
-      let location = await Location.getCurrentPositionAsync({})
-
-      dispatch(setOrigin(location))
-    })()
-  }, [])
-
   return (
     <NavigationContainer>
       <RootNavigator />

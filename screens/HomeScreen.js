@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import { StyleSheet, Text, TouchableHighlight, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import MapView, { PROVIDER_GOOGLE } from 'react-native-maps'
@@ -10,19 +10,8 @@ import { selectOrigin } from '../slices/mainSlice'
 
 export default function HomeScreen() {
   const [destinationMenu, setDestinationMenu] = useState(false)
-  const [loading, setLoading] = useState(true)
   const origin = useSelector(selectOrigin)
   const insets = useSafeAreaInsets();
-
-  useEffect(() => {
-    if (origin) {
-      setLoading(false)
-    }
-  }, [origin])
-
-  if (loading) {
-    return <Text>Loading...</Text>
-  }
 
   return (
     <View style={styles.map}>

@@ -1,10 +1,13 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { StyleSheet, Text, View } from 'react-native'
 
+import * as Location from 'expo-location';
+
 import { useDispatch } from 'react-redux'
+import { setOrigin } from '../slices/mainSlice';
 import { setIsLoading, setUserToken } from '../slices/authSlice';
 
-import { getAuth, onAuthStateChanged, signInWithEmailAndPassword } from "firebase/auth"
+import { getAuth, onAuthStateChanged } from "firebase/auth"
 import app from '../firebase'
 
 export default function SplashScreen() {
@@ -20,6 +23,21 @@ export default function SplashScreen() {
       dispatch(setUserToken(null))
     }
   });
+
+  useEffect(() => {
+    (async () => {
+      let { status } = await Location.requestForegroundPermissionsAsync()
+
+      if (status !== 'granted') {
+        console.log('Permission to access location was denied')
+        return
+      }
+
+      let location = await Location.getCurrentPositionAsync({})
+
+      dispatch(setOrigin(location))
+    })()
+  }, [])
 
   return (
     <View style={styles.container}>
