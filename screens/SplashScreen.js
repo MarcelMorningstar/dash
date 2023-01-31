@@ -38,7 +38,10 @@ export default function SplashScreen() {
 
       let location = await Location.getCurrentPositionAsync({})
 
-      dispatch(setOrigin(location))
+      dispatch(setOrigin({
+        latitude: location.coords.latitude,
+        longitude: location.coords.longitude
+      }))
 
       setIsLocated(true)
     })()

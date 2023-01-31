@@ -1,29 +1,51 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { StyleSheet, Text, TouchableHighlight, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import MapView, { PROVIDER_GOOGLE } from 'react-native-maps'
 
 import SlideInMenu from '../components/SlideInMenu'
 
-import { useSelector } from 'react-redux'
-import { selectOrigin } from '../slices/mainSlice'
+import { useSelector, useDispatch } from 'react-redux'
+import { selectOrigin, setOrigin } from '../slices/mainSlice'
+import { selectUserToken } from '../slices/authSlice';
+
+import { getDatabase, ref, set } from "firebase/database";
+import app from '../firebase'
 
 export default function HomeScreen() {
   const [destinationMenu, setDestinationMenu] = useState(false)
+  const dispatch = useDispatch()
   const origin = useSelector(selectOrigin)
+  const userToken = useSelector(selectUserToken)
   const insets = useSafeAreaInsets();
+
+  useEffect(() => {
+    writeUserLocationData(userToken, origin);
+  }, [origin])
+  
+  function writeUserLocationData(userId, location) {
+    const database = getDatabase(app);
+    
+    set(ref(database, 'users/' + userId), {
+      location: location
+    });
+  }
 
   return (
     <View style={styles.map}>
       <MapView
         initialRegion={{
-          latitude: origin.coords.latitude,
-          longitude: origin.coords.longitude,
+          latitude: origin.latitude,
+          longitude: origin.longitude,
           latitudeDelta: 0.005,
           longitudeDelta: 0.005,
         }}
         provider={PROVIDER_GOOGLE}
         showsUserLocation
+        onUserLocationChange={coordinate => dispatch(setOrigin({
+          latitude: coordinate.nativeEvent.coordinate.latitude,
+          longitude: coordinate.nativeEvent.coordinate.longitude
+        }))}
         mapType='mutedStandard'
         mapPadding={{
           top: insets.top
