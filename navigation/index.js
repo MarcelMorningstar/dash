@@ -10,7 +10,7 @@ import LoginScreen from '../screens/LoginScreen';
 import HomeScreen from '../screens/HomeScreen';
 import HistoryScreen from '../screens/HistoryScreen';
 import PaymentScreen from '../screens/PaymentScreen';
-import ProfileScreen from '../screens/ProfileScreen';
+import ProfileStackNavigator from './ProfileStackNavigator';
 import SettingsScreen from '../screens/SettingsScreen';
 
 import { useSelector } from 'react-redux';
@@ -55,8 +55,9 @@ function BottomTabNavigator() {
   return (
     <BottomTab.Navigator
       initialRouteName="Home"
+      backBehavior='history'
       screenOptions={{
-        tabBarShowLabel: false
+        tabBarShowLabel: false,
       }}>
       <BottomTab.Screen
         name="History"
@@ -81,10 +82,11 @@ function BottomTabNavigator() {
         }}
       />
       <BottomTab.Screen
-        name="Profile"
-        component={ProfileScreen}
+        name="ProfileStackNavigator"
+        component={ProfileStackNavigator}
         options={{
           tabBarIcon: ({ color }) => <Feather name="user" color={color} size={30} style={{ marginBottom: -3 }} />,
+          headerShown: false
         }}
       />
       <BottomTab.Screen
