@@ -1,33 +1,13 @@
-import React, { useEffect, useState } from 'react'
-import { Button, StyleSheet, Text, TextInput, TouchableHighlight, View } from 'react-native'
-import { MaterialIcons } from '@expo/vector-icons'
+import React from 'react'
+import { StyleSheet, Text, TouchableHighlight, View } from 'react-native'
+import { MaterialIcons, MaterialCommunityIcons } from '@expo/vector-icons'
 import Layout from '../components/Layout'
 
-import { useSelector } from 'react-redux';
-import { selectUserToken } from '../slices/authSlice';
-
-import { getFirestore, doc, getDoc } from "firebase/firestore";
-import app from '../firebase'
+import { useSelector } from 'react-redux'
+import { selectUserInfo } from '../slices/authSlice'
 
 export default function ProfileScreen({ navigation }) {
-  const [data, setData] = useState({})
-  const userToken = useSelector(selectUserToken)
-
-  const readUserData = async () => {
-    const database = getFirestore(app)
-    const docRef = doc(database, "users", userToken)
-    const docSnap = await getDoc(docRef)
-
-    const a = docSnap.data()
-
-    console.log(a.firstName)
-
-    setData(docSnap.data())
-  };
-
-  useEffect(() => {
-    readUserData()
-  }, [])
+  const data = useSelector(selectUserInfo);
 
   return (
     <Layout title='Profile' navigation={navigation}>
@@ -40,20 +20,67 @@ export default function ProfileScreen({ navigation }) {
         <MaterialIcons name="edit" size={28} color='black' />
       </TouchableHighlight>
 
-      <View>
-        <Image
+      <View style={styles.container}>
+        {/* <Image
           // style={}
           source={{
             uri: '',
           }}
-        />
-        <Text>{ data.firstName + ' ' + data.lastName }</Text>
+        /> */}
+        <Text style={styles.name}>{ data.firstName + ' ' + data.lastName }</Text>
+
+        <View style={styles.fieldContainer}>
+          <View style={styles.field}>
+            <MaterialIcons 
+              name="smartphone" 
+              size={30} 
+              color='black' 
+              style={{ marginRight: 12 }} 
+            />
+            <Text style={styles.textField}>{ data.phone }</Text>
+          </View>
+          {
+            !!data.email && 
+            <View style={styles.field}>
+              <MaterialCommunityIcons 
+                name="email-outline" 
+                size={30} 
+                color='black' 
+                style={{ marginRight: 12 }} 
+              />
+              <Text style={styles.textField}>{ data.email }</Text>
+            </View>
+          }
+        </View>
       </View>
     </Layout>
   )
 }
 
 const styles = StyleSheet.create({
+  container: {
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center'
+  },
+  name: {
+    fontSize: 20,
+    fontWeight: '600'
+  },
+  fieldContainer: {
+    width: '82%',
+    marginVertical: 20
+  },
+  field: {
+    display: 'flex',
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginVertical: 5
+  },
+  textField: {
+    fontSize: 14,
+    fontWeight: '400'
+  },
   edit: {
     position: 'absolute',
     top: 8,
