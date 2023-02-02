@@ -1,7 +1,7 @@
 import React, { useRef, useState } from 'react'
 import { StyleSheet, Text, TextInput, TouchableHighlight, TouchableOpacity, View } from 'react-native'
 
-import { FirebaseRecaptchaVerifierModal } from 'expo-firebase-recaptcha';
+import { FirebaseRecaptchaVerifierModal, FirebaseRecaptchaBanner } from 'expo-firebase-recaptcha';
 import { getAuth, PhoneAuthProvider, signInWithCredential } from "firebase/auth"
 import app from '../firebase'
 
@@ -57,7 +57,9 @@ export default function LoginScreen() {
       <FirebaseRecaptchaVerifierModal
         ref={recaptchaVerifier}
         firebaseConfig={app.options}
-        attemptInvisibleVerification
+        attemptInvisibleVerification={true}
+        title='Prove you are human!'
+        cancelLabel='Close'
       />
 
       <View style={{ width: '70%' }}>
@@ -116,6 +118,16 @@ export default function LoginScreen() {
           </TouchableOpacity>
         ) : undefined}
       </View>
+
+      <FirebaseRecaptchaBanner 
+        style={{
+          position: 'absolute',
+          bottom: 0,
+          marginVertical: 16,
+          marginHorizontal: 32
+        }}
+        textStyle={{ textAlign: 'center' }} 
+      />
     </View>
   )
 }
