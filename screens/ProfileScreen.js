@@ -1,6 +1,6 @@
 import React from 'react'
-import { StyleSheet, Text, TouchableHighlight, View } from 'react-native'
-import { MaterialIcons, MaterialCommunityIcons } from '@expo/vector-icons'
+import { Image, StyleSheet, Text, TouchableHighlight, View } from 'react-native'
+import { MaterialIcons, MaterialCommunityIcons, FontAwesome5 } from '@expo/vector-icons'
 import Layout from '../components/Layout'
 
 import { useSelector } from 'react-redux'
@@ -21,12 +21,25 @@ export default function ProfileScreen({ navigation }) {
       </TouchableHighlight>
 
       <View style={styles.container}>
-        {/* <Image
-          // style={}
-          source={{
-            uri: '',
-          }}
-        /> */}
+        <View style={styles.picContainer}>
+          {
+            !!data.image ?
+              <Image
+                source={{
+                  uri: data.image,
+                }}
+                style={{
+                  width: '100%',
+                  height: '100%',
+                  resizeMode: 'cover',
+                  borderRadius: 48
+                }}
+              />
+            :
+              <FontAwesome5 name="user-alt" size={32} color="#555555" />
+          }
+        </View>
+
         <Text style={styles.name}>{ data.firstName + ' ' + data.lastName }</Text>
 
         <View style={styles.fieldContainer}>
@@ -63,13 +76,23 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
     alignItems: 'center'
   },
+  picContainer: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: 96,
+    height: 96,
+    backgroundColor: '#DDDDDD',
+    borderRadius: 48
+  },
   name: {
-    fontSize: 20,
+    marginVertical: 5,
+    fontSize: 24,
     fontWeight: '600'
   },
   fieldContainer: {
     width: '82%',
-    marginVertical: 20
+    marginVertical: 16
   },
   field: {
     display: 'flex',
