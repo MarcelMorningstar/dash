@@ -8,36 +8,41 @@ import { setOrigin } from '../slices/mainSlice';
 import { setIsLoading, setUserInfo, setUserToken } from '../slices/authSlice';
 
 import { getAuth, onAuthStateChanged } from "firebase/auth"
-import { getFirestore, doc, getDoc } from "firebase/firestore";
+import { getFirestore, doc, getDoc } from "firebase/firestore"
+import { getDownloadURL, getStorage, ref } from "firebase/storage"
 import app from '../firebase'
 
 const auth = getAuth(app)
 const database = getFirestore(app)
+const storage = getStorage(app)
 
 export default function SplashScreen() {
   const [isLocated, setIsLocated] = useState(false)
   const [isAuth, setIsAuth] = useState(false)
-  const [isUser, setIsUser] = useState(false)
+  const [notAuth, setNotAuth] = useState(false)
   const dispatch = useDispatch()
 
   const readUserData = async (userToken) => {
     const docSnap = await getDoc(doc(database, "users", userToken))
+    const image = await getDownloadURL(ref(storage, `users/${userToken}.jpg`))
 
-    dispatch(setUserInfo(docSnap.data()))
+    dispatch(setUserInfo({
+      ...docSnap.data(),
+      image: image,
+    }))
 
-    setIsUser(true)
+    setIsAuth(true)
   };
 
   onAuthStateChanged(auth, (user) => {
     if (user) {
       dispatch(setUserToken(user.uid))
-
       readUserData(user.uid)
     } else {
       dispatch(setUserToken(null))
+      dispatch(setUserInfo({}))
+      setNotAuth(true)
     }
-
-    setIsAuth(true)
   });
 
   useEffect(() => {
@@ -61,10 +66,10 @@ export default function SplashScreen() {
   }, [])
 
   useEffect(() => {
-    if (isLocated && isAuth && isUser) {
+    if (isLocated && (isAuth || notAuth)) {
       dispatch(setIsLoading(false))
     }
-  }, [isLocated, isAuth, isUser])
+  }, [isLocated, isAuth, notAuth])
   
   return (
     <View style={styles.container}>
