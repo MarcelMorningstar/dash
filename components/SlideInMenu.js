@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from 'react'
-import { Animated, Text, TouchableWithoutFeedback, View } from 'react-native'
+import { Animated, Pressable, Text, TouchableHighlight, View } from 'react-native'
 import { Ionicons } from '@expo/vector-icons';
 
 export default function SlideInMenu({children, open, setOpen, title}) {
@@ -49,7 +49,7 @@ export default function SlideInMenu({children, open, setOpen, title}) {
         height: '100%',
       }}
     >
-      <TouchableWithoutFeedback style={{ width: '100%', height: '100%' }} onPress={handleClose}>
+      <Pressable style={{ width: '100%', height: '100%' }} onPress={handleClose}>
         <Animated.View
           style={{
             width: '100%',
@@ -58,7 +58,7 @@ export default function SlideInMenu({children, open, setOpen, title}) {
             opacity: fadeIn
           }}
         />
-      </TouchableWithoutFeedback>
+      </Pressable>
         
       <Animated.View 
         style={{ 
@@ -74,9 +74,16 @@ export default function SlideInMenu({children, open, setOpen, title}) {
         }}
       >
         <View style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
-          <TouchableWithoutFeedback onPress={handleClose}>
+          <TouchableHighlight 
+            activeOpacity={0.6}
+            underlayColor="#DDDDDD"
+            style={{
+              borderRadius: 32
+            }}
+            onPress={handleClose}
+          >
             <Ionicons name="close" size={32} style={{ marginBottom: -1 }} color="black" />
-          </TouchableWithoutFeedback>
+          </TouchableHighlight>
           
           <Text style={{ marginLeft: 4, fontSize: 21, fontWeight: '600' }}>{title}</Text>
         </View>
