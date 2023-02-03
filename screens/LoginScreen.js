@@ -1,5 +1,5 @@
 import React, { useRef, useState } from 'react'
-import { StyleSheet, Text, TextInput, TouchableHighlight, TouchableOpacity, View } from 'react-native'
+import { Image, StyleSheet, Text, TextInput, TouchableHighlight, TouchableOpacity, View } from 'react-native'
 
 import { FirebaseRecaptchaVerifierModal, FirebaseRecaptchaBanner } from 'expo-firebase-recaptcha';
 import { getAuth, PhoneAuthProvider, signInWithCredential } from "firebase/auth"
@@ -62,7 +62,16 @@ export default function LoginScreen() {
         cancelLabel='Close'
       />
 
-      <View style={{ width: '70%' }}>
+      <Image 
+        style={{
+          flex: 3.5,
+          width: '32%',
+          resizeMode: 'contain'
+        }}
+        source={require("../assets/logo.png")}
+      />
+
+      <View style={{ flex: 6.5, width: '70%' }}>
         <View style={styles.phoneContainer}>
           <TextInput 
             placeholder="Phone"
@@ -117,6 +126,50 @@ export default function LoginScreen() {
             </Text>
           </TouchableOpacity>
         ) : undefined}
+
+        <View style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+          <View style={{ flexGrow: 1, height: 1, marginRight: 12, backgroundColor: '#888888' }} />
+
+          <Text 
+            style={{ 
+              marginVertical: 30, 
+              fontSize: 13, 
+              fontWeight: '300', 
+              color: '#555555', 
+              textTransform: 'uppercase' 
+            }}
+          >
+            Or sign in with
+          </Text>
+
+          <View style={{ flexGrow: 1, height: 1, marginLeft: 12, backgroundColor: '#888888' }} />
+        </View>
+
+        <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center' }}>
+          <TouchableHighlight 
+            activeOpacity={0.9}
+            underlayColor="#DDDDDD"
+            style={styles.socialBtn}
+            onPress={() => {}}
+          >
+            <Image 
+              style={styles.socialImage}
+              source={require("../assets/google.png")}
+            />
+          </TouchableHighlight>
+
+          <TouchableHighlight 
+            activeOpacity={0.9}
+            underlayColor="#DDDDDD"
+            style={styles.socialBtn}
+            onPress={() => {}}
+          >
+            <Image 
+              style={styles.socialImage}
+              source={require("../assets/facebook.png")}
+            />
+          </TouchableHighlight>
+        </View>
       </View>
 
       <FirebaseRecaptchaBanner 
@@ -168,5 +221,24 @@ const styles = StyleSheet.create({
     color: 'white',
     fontSize: 20,
     fontWeight: '600'
+  },
+  socialBtn: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: 70,
+    height: 70,
+    marginHorizontal: 10,
+    padding: 10,
+    backgroundColor: 'white',
+    borderRadius: 35,
+    elevation: 4,
+    shadowColor: 'black',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.25
+  },
+  socialImage: {
+    width: '100%',
+    resizeMode: 'contain'
   }
 })
