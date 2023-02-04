@@ -40,8 +40,8 @@ export default function SplashScreen() {
 
   onAuthStateChanged(auth, (user) => {
     if (user) {
-      dispatch(setUserToken(user.uid))
-      readUserData(user.uid)
+      dispatch(setUserToken(user?.uid))
+      readUserData(user?.uid)
     } else {
       dispatch(setUserToken(null))
       dispatch(setUserInfo({}))

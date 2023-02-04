@@ -11,16 +11,16 @@ export default function ProfileScreen({ navigation }) {
 
   return (
     <Layout title='Profile' navigation={navigation}>
-      <TouchableHighlight
-        activeOpacity={0.6}
-        underlayColor="#DDDDDD"
-        style={styles.edit}
-        onPress={() => navigation.navigate('EditProfile')}
-      >
-        <MaterialIcons name="edit" size={28} color='black' />
-      </TouchableHighlight>
-
       <View style={styles.container}>
+        <TouchableHighlight
+          activeOpacity={0.6}
+          underlayColor="#DDDDDD"
+          style={styles.edit}
+          onPress={() => navigation.navigate('EditProfile')}
+        >
+          <MaterialIcons name="edit" size={28} color='black' />
+        </TouchableHighlight>
+
         <View style={styles.picContainer}>
           {
             !!data.image ?
@@ -106,7 +106,7 @@ const styles = StyleSheet.create({
   },
   edit: {
     position: 'absolute',
-    top: 8,
+    top: -52,
     right: 12,
     padding: 8,
     borderRadius: 32

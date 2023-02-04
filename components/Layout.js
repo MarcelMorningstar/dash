@@ -1,10 +1,13 @@
 import React from 'react'
 import { SafeAreaView, StatusBar, StyleSheet, Text, TouchableHighlight, View } from 'react-native'
 import { Ionicons } from '@expo/vector-icons'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
 export default function Layout({ navigation, children, title }) {
+  const insets = useSafeAreaInsets()
+
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={{ flex: 1, paddingTop: insets.top, backgroundColor: '#F5F5F5' }}>
       <View style={styles.head}>
         <TouchableHighlight
           activeOpacity={0.6}
@@ -23,10 +26,6 @@ export default function Layout({ navigation, children, title }) {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1, 
-    marginTop: StatusBar.currentHeight
-  },
   head: {
     display: 'flex',
     flexDirection: 'row',

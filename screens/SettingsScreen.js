@@ -1,20 +1,15 @@
-import { StyleSheet, Text, TouchableHighlight, View } from 'react-native'
 import React from 'react'
-
-import { useDispatch } from 'react-redux'
-import { setIsLoading, setUserToken } from '../slices/authSlice';
+import { StyleSheet, Text, TouchableHighlight, View } from 'react-native'
 
 import { getAuth, signOut } from "firebase/auth";
 import app from '../firebase'
 
-export default function SettingsScreen() {
-  const dispatch = useDispatch()
-  const auth = getAuth(app);
+const auth = getAuth(app);
 
+export default function SettingsScreen() {
   const handleSignOut = () => {
     signOut(auth).then(() => {
-      dispatch(setIsLoading(false))
-      dispatch(setUserToken(null))
+      
     }).catch((error) => {
       console.log(error)
     });
@@ -22,7 +17,7 @@ export default function SettingsScreen() {
 
   return (
     <View>
-      <TouchableHighlight onPress={ handleSignOut }>
+      <TouchableHighlight onPress={handleSignOut}>
         <Text>Log Out</Text>
       </TouchableHighlight>
     </View>

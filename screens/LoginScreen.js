@@ -1,5 +1,5 @@
 import React, { useRef, useState } from 'react'
-import { Image, SafeAreaView, StatusBar, StyleSheet, Text, TextInput, TouchableHighlight, TouchableOpacity, View } from 'react-native'
+import { Image, Keyboard, KeyboardAvoidingView, Platform, StatusBar, StyleSheet, Text, TextInput, TouchableHighlight, TouchableOpacity, TouchableWithoutFeedback, View } from 'react-native'
 
 import { FirebaseRecaptchaVerifierModal, FirebaseRecaptchaBanner } from 'expo-firebase-recaptcha';
 import { getAuth, PhoneAuthProvider, signInWithCredential } from "firebase/auth"
@@ -17,43 +17,47 @@ export default function LoginScreen() {
 
   if (!!verificationId) {
     return (
-      <View style={styles.container}>
-        <View style={{ width: '70%' }}>
-          <Text style={{ textAlign: 'center', fontSize: 32, fontWeight: '600' }}>Verification Code</Text>
-          <Text style={{ textAlign: 'center', fontSize: 16 }}>Please enter Code sent to {phoneNumber}</Text>
+      <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"}>
+        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+          <View style={styles.content}>
+            <View style={{ width: '70%' }}>
+              <Text style={{ textAlign: 'center', fontSize: 32, fontWeight: '600' }}>Verification Code</Text>
+              <Text style={{ textAlign: 'center', fontSize: 16 }}>Please enter Code sent to {phoneNumber}</Text>
 
-          <View style={styles.verifyContainer}>
-            <TextInput
-              editable={!!verificationId}
-              placeholder="123456"
-              onChangeText={setVerificationCode}
-              style={styles.phoneNumberInput}
-            />
-            <TouchableHighlight 
-              activeOpacity={0.9}
-              underlayColor="#d39109"
-              style={styles.btn}
-              disabled={!verificationId}
-              onPress={async () => {
-                try {
-                  const credential = PhoneAuthProvider.credential(verificationId, verificationCode);
-                  await signInWithCredential(auth, credential);
-                  showMessage({ text: 'Phone authentication successful 👍' });
-                } catch (err) {
-                  showMessage({ text: `Error: ${err.message}`, color: 'red' });
-                }
-              }}
-            >
-              <Text style={styles.btnText}>Verify</Text>
-            </TouchableHighlight>
+              <View style={styles.verifyContainer}>
+                <TextInput
+                  editable={!!verificationId}
+                  placeholder="123456"
+                  onChangeText={setVerificationCode}
+                  style={styles.phoneNumberInput}
+                />
+                <TouchableHighlight 
+                  activeOpacity={0.9}
+                  underlayColor="#d39109"
+                  style={styles.btn}
+                  disabled={!verificationId}
+                  onPress={async () => {
+                    try {
+                      const credential = PhoneAuthProvider.credential(verificationId, verificationCode);
+                      await signInWithCredential(auth, credential);
+                      showMessage({ text: 'Phone authentication successful 👍' });
+                    } catch (err) {
+                      showMessage({ text: `Error: ${err.message}`, color: 'red' });
+                    }
+                  }}
+                >
+                  <Text style={styles.btnText}>Verify</Text>
+                </TouchableHighlight>
+              </View>
+            </View>
           </View>
-        </View>
-      </View>
+        </TouchableWithoutFeedback>
+      </KeyboardAvoidingView>
     )
   }
 
   return (
-    <SafeAreaView style={styles.container}>
+    <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"}>
       <FirebaseRecaptchaVerifierModal
         ref={recaptchaVerifier}
         firebaseConfig={app.options}
@@ -62,135 +66,140 @@ export default function LoginScreen() {
         cancelLabel='Close'
       />
 
-      <Image 
-        style={{
-          flex: 3.5,
-          width: '32%',
-          resizeMode: 'contain'
-        }}
-        source={require("../assets/logo.png")}
-      />
-
-      <View style={{ flex: 6.5, width: '70%' }}>
-        <View style={styles.phoneContainer}>
-          <TextInput 
-            placeholder="Phone"
-            autoCompleteType="tel"
-            keyboardType="phone-pad"
-            value={phoneNumber}
-            textContentType="telephoneNumber"
-            onChangeText={setPhoneNumber}
-            style={styles.phoneNumberInput}
+      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+        <View style={styles.content}>
+          <Image 
+            style={{
+              flex: 4,
+              width: '32%',
+              resizeMode: 'contain'
+            }}
+            source={require("../assets/logo.png")}
           />
-          <TouchableHighlight 
-            activeOpacity={0.9}
-            underlayColor="#d39109"
-            style={styles.btn}
-            disabled={!phoneNumber}
-            onPress={async () => {
-              try {
-                const phoneProvider = new PhoneAuthProvider(auth);
-                const verificationId = await phoneProvider.verifyPhoneNumber(
-                  phoneNumber,
-                  recaptchaVerifier.current
-                );
           
-                setVerificationId(verificationId);
-                showMessage({
-                  text: 'Verification code has been sent to your phone.',
-                });
-              } catch (err) {
-                showMessage({ text: `Error: ${err.message}`, color: 'red' });
-              }
+          <View style={{ flex: 6, width: '70%' }}>
+            <View style={styles.phoneContainer}>
+              <TextInput 
+                placeholder="Phone"
+                autoCompleteType="tel"
+                keyboardType="phone-pad"
+                value={phoneNumber}
+                textContentType="telephoneNumber"
+                onChangeText={setPhoneNumber}
+                style={styles.phoneNumberInput}
+              />
+              <TouchableHighlight 
+                activeOpacity={0.9}
+                underlayColor="#d39109"
+                style={styles.btn}
+                disabled={!phoneNumber}
+                onPress={async () => {
+                  try {
+                    const phoneProvider = new PhoneAuthProvider(auth);
+                    const verificationId = await phoneProvider.verifyPhoneNumber(
+                      phoneNumber,
+                      recaptchaVerifier.current
+                    );
+              
+                    setVerificationId(verificationId);
+                    showMessage({
+                      text: 'Verification code has been sent to your phone.',
+                    });
+                  } catch (err) {
+                    showMessage({ text: `Error: ${err.message}`, color: 'red' });
+                  }
+                }}
+              >
+                <Text style={styles.btnText}>Sign in</Text>
+              </TouchableHighlight>
+            </View>
+          
+            {message ? (
+              <TouchableOpacity
+                style={[
+                  StyleSheet.absoluteFill,
+                  { backgroundColor: 0xffffffee, justifyContent: 'center' },
+                ]}
+                onPress={() => showMessage(undefined)}>
+                <Text
+                  style={{
+                    color: message.color || 'blue',
+                    fontSize: 17,
+                    textAlign: 'center',
+                    margin: 20,
+                  }}>
+                  {message.text}
+                </Text>
+              </TouchableOpacity>
+            ) : undefined}
+          
+            <View style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+              <View style={{ flexGrow: 1, height: 1, marginRight: 12, backgroundColor: '#888888' }} />
+          
+              <Text 
+                style={{ 
+                  marginVertical: 30, 
+                  fontSize: 13, 
+                  fontWeight: '300', 
+                  color: '#555555', 
+                  textTransform: 'uppercase' 
+                }}
+              >
+                Or sign in with
+              </Text>
+          
+              <View style={{ flexGrow: 1, height: 1, marginLeft: 12, backgroundColor: '#888888' }} />
+            </View>
+          
+            <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center' }}>
+              <TouchableHighlight 
+                activeOpacity={0.9}
+                underlayColor="#DDDDDD"
+                style={styles.socialBtn}
+                onPress={() => {}}
+              >
+                <Image 
+                  style={styles.socialImage}
+                  source={require("../assets/google.png")}
+                />
+              </TouchableHighlight>
+          
+              <TouchableHighlight 
+                activeOpacity={0.9}
+                underlayColor="#DDDDDD"
+                style={styles.socialBtn}
+                onPress={() => {}}
+              >
+                <Image 
+                  style={styles.socialImage}
+                  source={require("../assets/facebook.png")}
+                />
+              </TouchableHighlight>
+            </View>
+          </View>
+
+          <FirebaseRecaptchaBanner 
+            style={{
+              position: 'relative',
+              bottom: 0,
+              marginVertical: 24,
+              marginHorizontal: 32
             }}
-          >
-            <Text style={styles.btnText}>Sign in</Text>
-          </TouchableHighlight>
+            textStyle={{ textAlign: 'center' }} 
+          />
         </View>
-
-        {message ? (
-          <TouchableOpacity
-            style={[
-              StyleSheet.absoluteFill,
-              { backgroundColor: 0xffffffee, justifyContent: 'center' },
-            ]}
-            onPress={() => showMessage(undefined)}>
-            <Text
-              style={{
-                color: message.color || 'blue',
-                fontSize: 17,
-                textAlign: 'center',
-                margin: 20,
-              }}>
-              {message.text}
-            </Text>
-          </TouchableOpacity>
-        ) : undefined}
-
-        <View style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
-          <View style={{ flexGrow: 1, height: 1, marginRight: 12, backgroundColor: '#888888' }} />
-
-          <Text 
-            style={{ 
-              marginVertical: 30, 
-              fontSize: 13, 
-              fontWeight: '300', 
-              color: '#555555', 
-              textTransform: 'uppercase' 
-            }}
-          >
-            Or sign in with
-          </Text>
-
-          <View style={{ flexGrow: 1, height: 1, marginLeft: 12, backgroundColor: '#888888' }} />
-        </View>
-
-        <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center' }}>
-          <TouchableHighlight 
-            activeOpacity={0.9}
-            underlayColor="#DDDDDD"
-            style={styles.socialBtn}
-            onPress={() => {}}
-          >
-            <Image 
-              style={styles.socialImage}
-              source={require("../assets/google.png")}
-            />
-          </TouchableHighlight>
-
-          <TouchableHighlight 
-            activeOpacity={0.9}
-            underlayColor="#DDDDDD"
-            style={styles.socialBtn}
-            onPress={() => {}}
-          >
-            <Image 
-              style={styles.socialImage}
-              source={require("../assets/facebook.png")}
-            />
-          </TouchableHighlight>
-        </View>
-      </View>
-
-      <FirebaseRecaptchaBanner 
-        style={{
-          position: 'absolute',
-          bottom: 0,
-          marginVertical: 16,
-          marginHorizontal: 32
-        }}
-        textStyle={{ textAlign: 'center' }} 
-      />
-    </SafeAreaView>
+      </TouchableWithoutFeedback>
+    </KeyboardAvoidingView>
   )
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
+  content: {
     justifyContent: 'center',
     alignItems: 'center',
-    marginTop: StatusBar.currentHeight,
+    width: '100%', 
+    height: '100%',
+    paddingTop: StatusBar.currentHeight + 12,
     backgroundColor: '#F5F5F5'
   },
   verifyContainer: {
@@ -240,6 +249,7 @@ const styles = StyleSheet.create({
   },
   socialImage: {
     width: '100%',
+    height: '100%',
     resizeMode: 'contain'
   }
 })

@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react'
-import { StyleSheet, Text, TouchableHighlight, View } from 'react-native'
+import { KeyboardAvoidingView, Platform, StyleSheet, Text, TouchableHighlight, View } from 'react-native'
+import { MaterialIcons } from '@expo/vector-icons'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps'
 import MapViewDirections from 'react-native-maps-directions'
@@ -40,7 +41,7 @@ export default function HomeScreen() {
   }
 
   const userLocationChange = (coordinate) => {
-    if (!directionsView) {
+    if (!destination) {
       dispatch(setOrigin({
         latitude: coordinate.nativeEvent.coordinate.latitude,
         longitude: coordinate.nativeEvent.coordinate.longitude
@@ -54,12 +55,51 @@ export default function HomeScreen() {
     setTimeout(() => {
       setDirectionsView(true)
 
-      mapRef.current.fitToSuppliedMarkers(['origin', 'destination'])
+      mapRef.current.fitToSuppliedMarkers(['origin', 'destination'], {
+        edgePadding: {
+          top: Platform.OS === "ios" ? 50 : 0,
+          right: Platform.OS === "ios" ? 50 : 0,
+          left: Platform.OS === "ios" ? 50 : 0,
+          bottom: Platform.OS === "ios" ? 50 : 0,
+        }
+      })
     }, 100)
   }
   
   return (
-    <View style={styles.map}>
+    <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} style={styles.map}>
+      <TouchableHighlight
+        activeOpacity={0.6}
+        underlayColor="#DDDDDD"
+        style={{
+          position: 'absolute',
+          zIndex: 100,
+          top: insets.top + 12,
+          right: 16,
+          justifyContent: 'center',
+          alignItems: 'center',
+          width: 50,
+          height: 50,
+          padding: 8,
+          backgroundColor: 'white',
+          borderRadius: 25,
+          elevation: 7,
+          shadowColor: 'black',
+          shadowOffset: { width: 0, height: 0 },
+          shadowOpacity: 0.25
+        }}
+        onPress={() => { 
+          mapRef.current.animateToRegion({ 
+            latitude: origin.latitude, 
+            longitude: origin.longitude, 
+            latitudeDelta: 0.005,
+            longitudeDelta: 0.005,
+          }, 1000)
+        }}
+      >
+        <MaterialIcons name="my-location" size={25} color="black" />
+      </TouchableHighlight>
+
       <MapView
         ref={mapRef}
         initialRegion={{
@@ -71,7 +111,9 @@ export default function HomeScreen() {
         provider={PROVIDER_GOOGLE}
         showsUserLocation={!directionsView}
         onUserLocationChange={coordinate => userLocationChange(coordinate)}
-        mapType='mutedStandard'
+        showsMyLocationButton={false}
+        rotateEnabled={false}
+        mapType='terrain'
         mapPadding={{
           top: insets.top
         }}
@@ -169,7 +211,7 @@ export default function HomeScreen() {
           }}
         />
       </SlideInMenu>
-    </View>
+    </KeyboardAvoidingView>
   )
 }
 
