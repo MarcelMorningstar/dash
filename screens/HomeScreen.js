@@ -1,13 +1,14 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { StyleSheet, Text, TouchableHighlight, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
-import MapView, { PROVIDER_GOOGLE } from 'react-native-maps'
+import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps'
+import MapViewDirections from 'react-native-maps-directions'
 import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete'
 
 import SlideInMenu from '../components/SlideInMenu'
 
 import { useSelector, useDispatch } from 'react-redux'
-import { selectOrigin, setOrigin } from '../slices/mainSlice'
+import { selectDestination, selectOrigin, setDestination, setOrigin } from '../slices/mainSlice'
 import { selectUserToken } from '../slices/authSlice'
 
 import { getDatabase, ref, set } from "firebase/database"
@@ -16,11 +17,15 @@ import app from '../firebase'
 import { GOOGLE_API_KEY } from '@env'
 
 export default function HomeScreen() {
+  const insets = useSafeAreaInsets()
+  const mapRef = useRef(null)
+  const childRef = useRef(null)
+  const [directionsView, setDirectionsView] = useState(false)
   const [destinationMenu, setDestinationMenu] = useState(false)
   const dispatch = useDispatch()
   const origin = useSelector(selectOrigin)
+  const destination = useSelector(selectDestination)
   const userToken = useSelector(selectUserToken)
-  const insets = useSafeAreaInsets();
 
   useEffect(() => {
     writeUserLocationData(userToken, origin);
@@ -34,9 +39,29 @@ export default function HomeScreen() {
     });
   }
 
+  const userLocationChange = (coordinate) => {
+    if (!directionsView) {
+      dispatch(setOrigin({
+        latitude: coordinate.nativeEvent.coordinate.latitude,
+        longitude: coordinate.nativeEvent.coordinate.longitude
+      }))
+    }
+  }
+
+  const fitDerection = () => {
+    childRef.current.close()
+    
+    setTimeout(() => {
+      setDirectionsView(true)
+
+      mapRef.current.fitToSuppliedMarkers(['origin', 'destination'])
+    }, 100)
+  }
+  
   return (
     <View style={styles.map}>
       <MapView
+        ref={mapRef}
         initialRegion={{
           latitude: origin.latitude,
           longitude: origin.longitude,
@@ -44,18 +69,49 @@ export default function HomeScreen() {
           longitudeDelta: 0.005,
         }}
         provider={PROVIDER_GOOGLE}
-        showsUserLocation
-        onUserLocationChange={coordinate => dispatch(setOrigin({
-          latitude: coordinate.nativeEvent.coordinate.latitude,
-          longitude: coordinate.nativeEvent.coordinate.longitude
-        }))}
+        showsUserLocation={!directionsView}
+        onUserLocationChange={coordinate => userLocationChange(coordinate)}
         mapType='mutedStandard'
         mapPadding={{
           top: insets.top
         }}
         style={styles.map}
       >
+        {
+          origin && destination && (
+            <Marker 
+              identifier='origin'
+              coordinate={{
+                latitude: origin.latitude,
+                longitude: origin.longitude,
+              }}
+            />
+          )
+        }
 
+        {
+          origin && destination && (
+            <Marker 
+              identifier='destination'
+              coordinate={{
+                latitude: destination.latitude,
+                longitude: destination.longitude,
+              }}
+            />
+          )
+        }
+
+        {
+          origin && destination && (
+            <MapViewDirections 
+              origin={origin}
+              destination={destination}
+              apikey={GOOGLE_API_KEY}
+              strokeWidth={4}
+              strokeColor="black"
+            />
+          )
+        }
       </MapView>
 
       <View style={styles.inputContainer}>
@@ -64,7 +120,7 @@ export default function HomeScreen() {
         </TouchableHighlight>
       </View>
 
-      <SlideInMenu title='Your ride' size={320} open={destinationMenu} setOpen={setDestinationMenu}>
+      <SlideInMenu ref={childRef} title='Your ride' size={320} open={destinationMenu} setOpen={setDestinationMenu}>
         <View
           style={{
             display: 'flex',
@@ -86,6 +142,7 @@ export default function HomeScreen() {
             key: GOOGLE_API_KEY,
             language: 'en',
           }}
+          fetchDetails={true}
           minLength={2}
           styles={{
             container: {
@@ -102,6 +159,14 @@ export default function HomeScreen() {
             }
           }}
           enablePoweredByContainer={false}
+          onPress={(data, details = null) => {
+            dispatch(setDestination({
+              latitude: details.geometry.location.lat,
+              longitude: details.geometry.location.lng
+            }))
+      
+            fitDerection()
+          }}
         />
       </SlideInMenu>
     </View>

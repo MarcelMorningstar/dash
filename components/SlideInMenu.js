@@ -1,17 +1,23 @@
-import React, { useEffect, useRef } from 'react'
+import React, { forwardRef, useEffect, useImperativeHandle, useRef } from 'react'
 import { Animated, Keyboard, Pressable, Text, TouchableHighlight, View } from 'react-native'
 import { Ionicons } from '@expo/vector-icons';
 
-export default function SlideInMenu({children, open, setOpen, title, size}) {
+const SlideInMenu = forwardRef((props, ref) => {
   const slideIn = useRef(new Animated.Value(0)).current
   const fadeIn = useRef(new Animated.Value(0)).current
   
+  useImperativeHandle(ref, () => ({
+    close() {
+      handleClose()
+    }
+  }));
+
   useEffect(() => {
-    if (open) {
+    if (props.open) {
       Animated.sequence([
         Animated.parallel([
           Animated.timing(slideIn, {
-            toValue: -Math.abs(size),
+            toValue: -Math.abs(props.size),
             duration: 500,
             useNativeDriver: true,
           }),
@@ -22,7 +28,7 @@ export default function SlideInMenu({children, open, setOpen, title, size}) {
         ]),
       ]).start()
     }
-  }, [open])
+  }, [props.open])
 
   const handleClose = () => {
     Animated.sequence([
@@ -39,7 +45,7 @@ export default function SlideInMenu({children, open, setOpen, title, size}) {
       ]),
     ]).start(() => {
       Keyboard.dismiss()
-      setOpen(false)
+      props.setOpen(false)
     })
   }
 
@@ -47,7 +53,7 @@ export default function SlideInMenu({children, open, setOpen, title, size}) {
     <View 
       style= {{
         position: 'absolute',
-        display: open ? 'flex' : 'none',
+        display: props.open ? 'flex' : 'none',
         width: '100%',
         height: '100%',
       }}
@@ -66,10 +72,10 @@ export default function SlideInMenu({children, open, setOpen, title, size}) {
       <Animated.View 
         style={{ 
           position: 'absolute',
-          bottom: -Math.abs(size),
+          bottom: -Math.abs(props.size),
           transform: [{ translateY: slideIn }],
           width: '100%',
-          height: size,
+          height: props.size,
           padding: 4,
           backgroundColor: '#FFF',
           borderTopLeftRadius: 12,
@@ -88,13 +94,15 @@ export default function SlideInMenu({children, open, setOpen, title, size}) {
             <Ionicons name="close" size={35} color="black" />
           </TouchableHighlight>
           
-          <Text style={{ marginLeft: 4, fontSize: 21, fontWeight: '600' }}>{title}</Text>
+          <Text style={{ marginLeft: 4, fontSize: 21, fontWeight: '600' }}>{props.title}</Text>
         </View>
 
         <View style={{ paddingHorizontal: 12, paddingTop: 16 }}>
-          {children}
+          {props.children}
         </View>
       </Animated.View>
     </View>
   )
-}
+})
+
+export default SlideInMenu
