@@ -1,16 +1,19 @@
 import React, { useEffect, useState } from 'react'
 import { StyleSheet, Text, TouchableHighlight, View } from 'react-native'
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import MapView, { PROVIDER_GOOGLE } from 'react-native-maps'
+import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete'
 
 import SlideInMenu from '../components/SlideInMenu'
 
 import { useSelector, useDispatch } from 'react-redux'
 import { selectOrigin, setOrigin } from '../slices/mainSlice'
-import { selectUserToken } from '../slices/authSlice';
+import { selectUserToken } from '../slices/authSlice'
 
-import { getDatabase, ref, set } from "firebase/database";
+import { getDatabase, ref, set } from "firebase/database"
 import app from '../firebase'
+
+import { GOOGLE_API_KEY } from '@env'
 
 export default function HomeScreen() {
   const [destinationMenu, setDestinationMenu] = useState(false)
@@ -61,8 +64,45 @@ export default function HomeScreen() {
         </TouchableHighlight>
       </View>
 
-      <SlideInMenu title='Your ride' open={destinationMenu} setOpen={setDestinationMenu}>
-        <Text>Hello</Text>
+      <SlideInMenu title='Your ride' size={320} open={destinationMenu} setOpen={setDestinationMenu}>
+        <View
+          style={{
+            display: 'flex',
+            justifyContent: 'center',
+            height: 44,
+            marginVertical: 4,
+            paddingHorizontal: 12,
+            backgroundColor: '#D7D7D7',
+            borderRadius: 12
+          }}
+        >
+          <Text style={{ fontSize: 18 }}>My Location</Text>
+        </View>
+
+        <GooglePlacesAutocomplete 
+          placeholder='Type in your destination'
+          nearbyPlacesAPI='GooglePlacesSearch'
+          query={{
+            key: GOOGLE_API_KEY,
+            language: 'en',
+          }}
+          minLength={2}
+          styles={{
+            container: {
+              flex: 0,
+              marginVertical: 4,
+            },
+            textInput: {
+              fontSize: 18,
+              backgroundColor: '#FFF',
+              borderRadius: 12
+            },
+            listView: {
+              height: 130
+            }
+          }}
+          enablePoweredByContainer={false}
+        />
       </SlideInMenu>
     </View>
   )

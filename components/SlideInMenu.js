@@ -1,8 +1,8 @@
 import React, { useEffect, useRef } from 'react'
-import { Animated, Pressable, Text, TouchableHighlight, View } from 'react-native'
+import { Animated, Keyboard, Pressable, Text, TouchableHighlight, View } from 'react-native'
 import { Ionicons } from '@expo/vector-icons';
 
-export default function SlideInMenu({children, open, setOpen, title}) {
+export default function SlideInMenu({children, open, setOpen, title, size}) {
   const slideIn = useRef(new Animated.Value(0)).current
   const fadeIn = useRef(new Animated.Value(0)).current
   
@@ -11,7 +11,7 @@ export default function SlideInMenu({children, open, setOpen, title}) {
       Animated.sequence([
         Animated.parallel([
           Animated.timing(slideIn, {
-            toValue: -200,
+            toValue: -Math.abs(size),
             duration: 500,
             useNativeDriver: true,
           }),
@@ -37,7 +37,10 @@ export default function SlideInMenu({children, open, setOpen, title}) {
           useNativeDriver: true,
         }),
       ]),
-    ]).start(() => {setOpen(false)})
+    ]).start(() => {
+      Keyboard.dismiss()
+      setOpen(false)
+    })
   }
 
   return (
@@ -63,12 +66,12 @@ export default function SlideInMenu({children, open, setOpen, title}) {
       <Animated.View 
         style={{ 
           position: 'absolute',
-          bottom: -200,
+          bottom: -Math.abs(size),
           transform: [{ translateY: slideIn }],
           width: '100%',
-          height: 200,
+          height: size,
           padding: 4,
-          backgroundColor: '#fff',
+          backgroundColor: '#FFF',
           borderTopLeftRadius: 12,
           borderTopRightRadius: 12,
         }}
@@ -82,13 +85,13 @@ export default function SlideInMenu({children, open, setOpen, title}) {
             }}
             onPress={handleClose}
           >
-            <Ionicons name="close" size={32} style={{ marginBottom: -1 }} color="black" />
+            <Ionicons name="close" size={35} color="black" />
           </TouchableHighlight>
           
           <Text style={{ marginLeft: 4, fontSize: 21, fontWeight: '600' }}>{title}</Text>
         </View>
 
-        <View style={{ paddingHorizontal: 12, paddingTop: 8 }}>
+        <View style={{ paddingHorizontal: 12, paddingTop: 16 }}>
           {children}
         </View>
       </Animated.View>
