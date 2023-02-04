@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { StyleSheet, Text, View } from 'react-native'
+import { Image, StyleSheet, View } from 'react-native'
 
 import * as Location from 'expo-location';
 
@@ -73,7 +73,13 @@ export default function SplashScreen() {
   
   return (
     <View style={styles.container}>
-      <Text>SplashScreen</Text>
+      <Image 
+        style={{
+          width: '40%',
+          resizeMode: 'contain'
+        }}
+        source={require("../assets/logo.png")}
+      />
     </View>
   )
 }

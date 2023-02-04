@@ -1,5 +1,5 @@
 import React, { useRef, useState } from 'react'
-import { Image, StyleSheet, Text, TextInput, TouchableHighlight, TouchableOpacity, View } from 'react-native'
+import { Image, SafeAreaView, StatusBar, StyleSheet, Text, TextInput, TouchableHighlight, TouchableOpacity, View } from 'react-native'
 
 import { FirebaseRecaptchaVerifierModal, FirebaseRecaptchaBanner } from 'expo-firebase-recaptcha';
 import { getAuth, PhoneAuthProvider, signInWithCredential } from "firebase/auth"
@@ -53,7 +53,7 @@ export default function LoginScreen() {
   }
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <FirebaseRecaptchaVerifierModal
         ref={recaptchaVerifier}
         firebaseConfig={app.options}
@@ -181,7 +181,7 @@ export default function LoginScreen() {
         }}
         textStyle={{ textAlign: 'center' }} 
       />
-    </View>
+    </SafeAreaView>
   )
 }
 
@@ -190,6 +190,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+    marginTop: StatusBar.currentHeight,
     backgroundColor: '#F5F5F5'
   },
   verifyContainer: {
