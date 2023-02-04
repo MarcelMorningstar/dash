@@ -24,7 +24,11 @@ export default function SplashScreen() {
 
   const readUserData = async (userToken) => {
     const docSnap = await getDoc(doc(database, "users", userToken))
-    const image = await getDownloadURL(ref(storage, `users/${userToken}.jpg`))
+    let image = null
+
+    try {
+      image = await getDownloadURL(ref(storage, `users/${userToken}.jpg`))
+    } catch(e) {  }
 
     dispatch(setUserInfo({
       ...docSnap.data(),
