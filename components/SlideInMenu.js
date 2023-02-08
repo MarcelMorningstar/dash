@@ -53,6 +53,7 @@ const SlideInMenu = forwardRef((props, ref) => {
     <View 
       style= {{
         position: 'absolute',
+        zIndex: 10,
         display: props.open ? 'flex' : 'none',
         width: '100%',
         height: '100%',
