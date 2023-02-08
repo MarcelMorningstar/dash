@@ -27,7 +27,7 @@ export default function SplashScreen() {
     let image = null
 
     try {
-      image = await getDownloadURL(ref(storage, `users/${userToken}.jpg`))
+      image = await getDownloadURL(ref(storage, `users/${userToken}`))
     } catch(e) {  }
 
     dispatch(setUserInfo({
