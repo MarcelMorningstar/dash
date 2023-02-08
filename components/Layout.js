@@ -1,9 +1,9 @@
 import React from 'react'
-import { SafeAreaView, StatusBar, StyleSheet, Text, TouchableHighlight, View } from 'react-native'
+import { SafeAreaView, StyleSheet, Text, TouchableHighlight, View } from 'react-native'
 import { Ionicons } from '@expo/vector-icons'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
-export default function Layout({ navigation, children, title }) {
+export default function Layout({ navigation, backScreen, children, title }) {
   const insets = useSafeAreaInsets()
 
   return (
@@ -13,7 +13,9 @@ export default function Layout({ navigation, children, title }) {
           activeOpacity={0.6}
           underlayColor="#DDDDDD"
           style={styles.back}
-          onPress={() => navigation.goBack()}
+          onPress={() => { 
+            backScreen ? navigation.navigate(backScreen) : navigation.goBack() 
+          }}
         >
           <Ionicons name="arrow-back" size={32} color='black' />
         </TouchableHighlight>

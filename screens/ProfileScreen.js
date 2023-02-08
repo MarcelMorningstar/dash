@@ -12,7 +12,7 @@ export default function ProfileScreen({ navigation }) {
   const [logout, setLogout] = useState(false);
 
   return (
-    <Layout title='Profile' navigation={navigation}>
+    <Layout title='Profile' navigation={navigation} backScreen='Home'>
       <View style={styles.container}>
         <TouchableHighlight
           activeOpacity={0.6}

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { Image, ScrollView, StyleSheet, Text, TextInput, TouchableHighlight, TouchableWithoutFeedback, View } from 'react-native'
-import { FontAwesome5 } from '@expo/vector-icons'
+import { FontAwesome5, MaterialIcons } from '@expo/vector-icons'
 import Layout from '../components/Layout'
 
 import * as ImagePicker from 'expo-image-picker'
@@ -75,7 +75,7 @@ export default function EditProfileScreen({ navigation }) {
       cash: userInfo.cash,
     }))
 
-    navigation.goBack()
+    navigation.navigate('Profile')
   }
 
   const pickImage = async () => {
@@ -93,10 +93,13 @@ export default function EditProfileScreen({ navigation }) {
   };
 
   return (
-    <Layout title='Edit Profile' navigation={navigation}>
+    <Layout title='Edit Profile' navigation={navigation} backScreen='Profile' >
       <ScrollView contentContainerStyle={styles.container}>
         <TouchableWithoutFeedback onPress={pickImage}>
           <View style={styles.picContainer}>
+            <View style={{ position: 'absolute', zIndex: 10, top: 0, right: 0, padding: 4, backgroundColor: '#F5AD17', borderRadius: 20 }}>
+              <MaterialIcons name="edit" size={21} color='white' />
+            </View>
             {
               userInfo.image || image ?
                 <Image
