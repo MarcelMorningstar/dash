@@ -94,6 +94,7 @@ function BottomTabNavigator() {
         component={SettingsScreen}
         options={{
           tabBarIcon: ({ color }) => <Ionicons name="settings-outline" color={color} size={30} style={{ marginBottom: -3 }} />,
+          headerShown: false
         }}
       /> 
     </BottomTab.Navigator>

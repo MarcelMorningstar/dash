@@ -6,7 +6,7 @@ import app from '../firebase'
 
 const auth = getAuth(app);
 
-export default function Layout({ visible, setVisible }) {
+export default function Logout({ visible, setVisible }) {
     const handleSignOut = () => {
         signOut(auth).then(() => {
           

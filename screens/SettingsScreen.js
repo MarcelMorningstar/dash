@@ -1,27 +1,111 @@
-import React from 'react'
-import { StyleSheet, Text, TouchableHighlight, View } from 'react-native'
+import React, { useState } from 'react'
+import { ScrollView, StyleSheet, Text, TouchableHighlight, View } from 'react-native'
+import { Feather, FontAwesome5, Ionicons } from '@expo/vector-icons'
+import Layout from '../components/Layout'
+import SettingsSection from '../components/SettingsSection'
+import Logout from '../components/Logout'
 
-import { getAuth, signOut } from "firebase/auth";
-import app from '../firebase'
-
-const auth = getAuth(app);
-
-export default function SettingsScreen() {
-  const handleSignOut = () => {
-    signOut(auth).then(() => {
-      
-    }).catch((error) => {
-      console.log(error)
-    });
-  }
+export default function SettingsScreen({ navigation }) {
+  const [logout, setLogout] = useState(false);
 
   return (
-    <View>
-      <TouchableHighlight onPress={handleSignOut}>
-        <Text>Log Out</Text>
-      </TouchableHighlight>
-    </View>
+    <Layout title='Edit Profile' navigation={navigation}>
+      <ScrollView>
+        <SettingsSection title='Preferences'>
+          <TouchableHighlight 
+            activeOpacity={0.6}
+            underlayColor="#DDDDDD"
+            style={styles.option}
+            onPress={() => {}}
+          >
+            <View style={styles.optionContainer}>
+              <View style={styles.optionLabel}>
+                <Ionicons name="language" size={24} style={styles.optionIcon} />
+                <Text style={styles.optionText}>Language</Text>
+              </View>
+              <Text style={styles.optionText}>Value</Text>
+            </View>
+          </TouchableHighlight>
+
+          <TouchableHighlight 
+            activeOpacity={0.6}
+            underlayColor="#DDDDDD"
+            style={styles.option}
+            onPress={() => {}}
+          >
+            <View style={styles.optionContainer}>
+              <View style={styles.optionLabel}>
+                <FontAwesome5 name="moon" size={24} style={styles.optionIcon} />
+                <Text style={styles.optionText}>Theme</Text>
+              </View>
+              <Text style={styles.optionText}>Value</Text>
+            </View>
+          </TouchableHighlight>
+        </SettingsSection>
+
+        <SettingsSection title='Account Action'>
+          <TouchableHighlight 
+            activeOpacity={0.6}
+            underlayColor="#DDDDDD"
+            style={styles.option}
+            onPress={() => navigation.navigate('ProfileStackNavigator', { screen: 'EditProfile' })}
+          >
+            <View style={styles.optionLabel}>
+              <FontAwesome5 name="user-circle" size={24} style={styles.optionIcon} />
+              <Text style={styles.optionText}>Edit Profile</Text>
+            </View>
+          </TouchableHighlight>
+
+          <TouchableHighlight 
+            activeOpacity={0.6}
+            underlayColor="#DDDDDD"
+            style={styles.option}
+            onPress={() => {}}
+          >
+            <View style={styles.optionLabel}>
+              <FontAwesome5 name="history" size={24} style={styles.optionIcon} />
+              <Text style={styles.optionText}>Clear Ride History</Text>
+            </View>
+          </TouchableHighlight>
+
+          <TouchableHighlight 
+            activeOpacity={0.6}
+            underlayColor="#DDDDDD"
+            style={styles.option}
+            onPress={() => setLogout(true)}
+          >
+            <View style={styles.optionLabel}>
+              <Feather name="log-out" size={24} style={styles.optionIcon} />
+              <Text style={styles.optionText}>Log Out</Text>
+              <Logout visible={logout} setVisible={setLogout} />
+            </View>
+          </TouchableHighlight>
+        </SettingsSection>
+      </ScrollView>
+    </Layout>
   )
 }
 
-const styles = StyleSheet.create({})
+const styles = StyleSheet.create({
+  option: {
+    justifyContent: 'center',
+    width: '100%',
+    height: 48,
+    paddingHorizontal: 24,
+    borderBottomWidth: 1,
+    borderBottomColor: '#DDDDDD'
+  },
+  optionContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between'
+  },
+  optionLabel: {
+    flexDirection: 'row'
+  },
+  optionIcon: {
+    marginRight: 8
+  },
+  optionText: {
+    fontSize: 16
+  }
+})
