@@ -1,16 +1,14 @@
-import React, { forwardRef, useEffect, useImperativeHandle, useRef } from 'react'
-import { Animated, Keyboard, Pressable, Text, TouchableHighlight, View } from 'react-native'
+import React, { forwardRef, useEffect, useRef } from 'react'
+import { Animated, Keyboard, Text, TouchableHighlight, View } from 'react-native'
 import { Ionicons } from '@expo/vector-icons';
 
+import { useDispatch } from 'react-redux'
+import { setDestination } from '../slices/mainSlice'
+
 const SlideInMenu = forwardRef((props, ref) => {
+  const dispatch = useDispatch()
   const slideIn = useRef(new Animated.Value(0)).current
   const fadeIn = useRef(new Animated.Value(0)).current
-  
-  useImperativeHandle(ref, () => ({
-    close() {
-      handleClose()
-    }
-  }));
 
   useEffect(() => {
     if (props.open) {
@@ -31,6 +29,9 @@ const SlideInMenu = forwardRef((props, ref) => {
   }, [props.open])
 
   const handleClose = () => {
+    dispatch(setDestination(null))
+    props.setDirectionsView(false)
+
     Animated.sequence([
       Animated.parallel([
         Animated.timing(slideIn, {
@@ -46,6 +47,7 @@ const SlideInMenu = forwardRef((props, ref) => {
     ]).start(() => {
       Keyboard.dismiss()
       props.setOpen(false)
+      props.fitUser()
     })
   }
 
@@ -53,23 +55,12 @@ const SlideInMenu = forwardRef((props, ref) => {
     <View 
       style= {{
         position: 'absolute',
-        zIndex: 10,
+        bottom: 0,
         display: props.open ? 'flex' : 'none',
         width: '100%',
-        height: '100%',
+        height: props.size,
       }}
-    >
-      <Pressable style={{ width: '100%', height: '100%' }} onPress={handleClose}>
-        <Animated.View
-          style={{
-            width: '100%',
-            height: '100%',
-            backgroundColor: 'rgb(0, 0, 0)',
-            opacity: fadeIn
-          }}
-        />
-      </Pressable>
-        
+    >  
       <Animated.View 
         style={{ 
           position: 'absolute',
@@ -98,7 +89,7 @@ const SlideInMenu = forwardRef((props, ref) => {
           <Text style={{ marginLeft: 4, fontSize: 21, fontWeight: '600' }}>{props.title}</Text>
         </View>
 
-        <View style={{ paddingHorizontal: 12, paddingTop: 16 }}>
+        <View style={{ height: props.size - 50, paddingHorizontal: 12, paddingTop: 16 }}>
           {props.children}
         </View>
       </Animated.View>
