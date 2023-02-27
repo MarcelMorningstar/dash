@@ -18,13 +18,23 @@
       "**/*"
     ],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": false,
+      "infoPlist": {
+        "UIBackgroundModes": [
+          "location",
+          "fetch"
+        ]
+      }
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#FFFFFF"
-      }
+      },
+      "permissions": [
+        "android.permission.RECORD_AUDIO"
+      ],
+      "package": "com.quentincoldwater.dash"
     },
     "web": {
       "favicon": "./assets/favicon.png"
@@ -36,6 +46,11 @@
           "photosPermission": "The app accesses your photos to let you share them with drivers."
         }
       ]
-    ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "6b72b37c-1bfb-469e-9985-1f61728f878b"
+      }
+    }
   }
 }

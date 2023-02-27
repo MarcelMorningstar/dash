@@ -7,14 +7,10 @@ import { useDispatch } from 'react-redux'
 import { setOrigin } from '../slices/mainSlice';
 import { setIsLoading, setUserInfo, setUserToken } from '../slices/authSlice';
 
-import { getAuth, onAuthStateChanged } from "firebase/auth"
-import { getFirestore, doc, getDoc } from "firebase/firestore"
-import { getDownloadURL, getStorage, ref } from "firebase/storage"
-import app from '../firebase'
-
-const auth = getAuth(app)
-const database = getFirestore(app)
-const storage = getStorage(app)
+import { onAuthStateChanged } from "firebase/auth"
+import { doc, getDoc } from "firebase/firestore"
+import { getDownloadURL, ref } from "firebase/storage"
+import { auth, firestore, storage } from '../firebase'
 
 export default function SplashScreen() {
   const [isLocated, setIsLocated] = useState(false)
@@ -23,7 +19,7 @@ export default function SplashScreen() {
   const dispatch = useDispatch()
 
   const readUserData = async (userToken) => {
-    const docSnap = await getDoc(doc(database, "users", userToken))
+    const docSnap = await getDoc(doc(firestore, "users", userToken))
     let image = null
 
     try {

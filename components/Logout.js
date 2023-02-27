@@ -1,10 +1,8 @@
 import React from 'react'
 import { Modal, StyleSheet, Text, TouchableOpacity, View} from 'react-native'
 
-import { getAuth, signOut } from "firebase/auth";
-import app from '../firebase'
-
-const auth = getAuth(app);
+import { signOut } from "firebase/auth";
+import { auth } from '../firebase'
 
 export default function Logout({ visible, setVisible }) {
     const handleSignOut = () => {

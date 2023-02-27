@@ -2,10 +2,8 @@ import React, { useEffect, useState } from 'react'
 import { Image, StyleSheet, View } from 'react-native'
 import { Marker } from 'react-native-maps'
 
-import { getDownloadURL, getStorage, ref } from "firebase/storage"
-import app from '../firebase'
-
-const storage = getStorage(app)
+import { getDownloadURL, ref } from "firebase/storage"
+import { storage } from '../firebase'
 
 export default function DriverMarker({ driver }) {
   const [image, setImage] = useState(null)

@@ -3,7 +3,7 @@ import { StyleSheet, Text, View } from 'react-native'
 import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete'
 
 import { useDispatch, useSelector } from 'react-redux'
-import { selectDestination, selectOrigin, setDestination } from '../slices/mainSlice'
+import { selectDestination, selectOrigin, setDestination } from '../../slices/mainSlice'
 
 import { GOOGLE_API_KEY } from '@env'
 
@@ -72,7 +72,7 @@ export default function DestinationChoice({ setDirectionsView, fitDerection }) {
 
               setDirectionsView(true)
               
-              fitDerection()
+              fitDerection(100)
             }}
           />
         )

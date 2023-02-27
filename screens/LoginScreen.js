@@ -2,10 +2,8 @@ import React, { useRef, useState } from 'react'
 import { Image, Keyboard, KeyboardAvoidingView, Platform, StatusBar, StyleSheet, Text, TextInput, TouchableHighlight, TouchableOpacity, TouchableWithoutFeedback, View } from 'react-native'
 
 import { FirebaseRecaptchaVerifierModal, FirebaseRecaptchaBanner } from 'expo-firebase-recaptcha';
-import { getAuth, PhoneAuthProvider, signInWithCredential } from "firebase/auth"
-import app from '../firebase'
-
-const auth = getAuth(app)
+import { PhoneAuthProvider, signInWithCredential } from "firebase/auth"
+import { auth } from '../firebase'
 
 export default function LoginScreen() {
   const recaptchaVerifier = useRef(null)

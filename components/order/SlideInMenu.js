@@ -1,14 +1,36 @@
-import React, { forwardRef, useEffect, useRef } from 'react'
+import React, { forwardRef, useEffect, useImperativeHandle, useRef } from 'react'
 import { Animated, Keyboard, Text, TouchableHighlight, View } from 'react-native'
 import { Ionicons } from '@expo/vector-icons';
 
 import { useDispatch } from 'react-redux'
-import { setDestination } from '../slices/mainSlice'
+import { setDestination } from '../../slices/mainSlice'
 
 const SlideInMenu = forwardRef((props, ref) => {
   const dispatch = useDispatch()
   const slideIn = useRef(new Animated.Value(0)).current
   const fadeIn = useRef(new Animated.Value(0)).current
+
+  useImperativeHandle(ref, () => ({
+    close() {
+      Animated.sequence([
+        Animated.parallel([
+          Animated.timing(slideIn, {
+            toValue: 0,
+            duration: 500,
+            useNativeDriver: true,
+          }),
+          Animated.timing(fadeIn, {
+            toValue: 0,
+            useNativeDriver: true,
+          }),
+        ]),
+      ]).start(() => {
+        Keyboard.dismiss()
+        props.setOpen(false)
+        props.fitUser()
+      })
+    }
+  }))
 
   useEffect(() => {
     if (props.open) {
@@ -78,9 +100,7 @@ const SlideInMenu = forwardRef((props, ref) => {
           <TouchableHighlight 
             activeOpacity={0.6}
             underlayColor="#DDDDDD"
-            style={{
-              borderRadius: 32
-            }}
+            style={{ borderRadius: 32 }}
             onPress={handleClose}
           >
             <Ionicons name="close" size={35} color="black" />

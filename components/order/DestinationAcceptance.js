@@ -2,17 +2,16 @@ import React, { useEffect } from 'react'
 import { StyleSheet, Text, TouchableHighlight, View } from 'react-native'
 
 import { useDispatch, useSelector } from 'react-redux'
-import { selectDestination, selectOrigin, selectTravelInformation, setDestination, setTravelInformation } from '../slices/mainSlice'
-import { selectUserToken } from '../slices/authSlice';
+import { selectDestination, selectOrigin, selectTravelInformation, setDestination, setTravelInformation } from '../../slices/mainSlice'
+import { selectUserToken } from '../../slices/authSlice';
+import { setOrderToken, setOrderInformation } from '../../slices/orderSlice';
 
-import { getFirestore, collection, addDoc } from "firebase/firestore";
-import app from '../firebase'
+import { collection, addDoc } from "firebase/firestore";
+import { firestore } from '../../firebase'
 
 import { GOOGLE_API_KEY } from '@env'
 
-const database = getFirestore(app);
-
-export default function DestinationAcceptance({ registerBackgroundFetchAsync, unregisterBackgroundFetchAsync, setOrdered, setDirectionsView, fitUser }) {
+export default function DestinationAcceptance({ setStatus, setDirectionsView, fitUser }) {
   const dispatch = useDispatch()
   const userToken = useSelector(selectUserToken)
   const origin = useSelector(selectOrigin)
@@ -42,7 +41,7 @@ export default function DestinationAcceptance({ registerBackgroundFetchAsync, un
 
     if (minutes >= 60) {
       hours = (Math.floor(minutes / 60)).toString().padStart(2, '0')
-      minutes = minutes - hours * 60
+      minutes = (minutes - hours * 60).toString().padStart(2, '0')
 
       return `${hours}:${minutes}:${seconds}` || '00:00:00'
     } else {
@@ -51,11 +50,9 @@ export default function DestinationAcceptance({ registerBackgroundFetchAsync, un
   }
 
   const createCall = async () => {
-    const docRef = await addDoc(collection(database, "calls"), {
-      inWait: true,
-      inProgress: false,
-      ended: false,
-      payed: false,
+    const docRef = await addDoc(collection(firestore, "calls"), {
+      created_at: new Date(),
+      status: 'in wait',
       user: {
         id: userToken,
         latitude: origin.latitude,
@@ -67,6 +64,25 @@ export default function DestinationAcceptance({ registerBackgroundFetchAsync, un
         duration: getDuration(travelInformation?.duration.value)
       }
     });
+
+    console.log(docRef.id)
+
+    dispatch(setOrderToken(docRef.id))
+    dispatch(setOrderInformation({
+      status: 'in wait',
+      user: {
+        id: userToken,
+        latitude: origin.latitude,
+        longitude: origin.longitude
+      },
+      destination: destination,
+      travelInformation: {
+        distance: getDistance(travelInformation?.distance.value),
+        duration: getDuration(travelInformation?.duration.value)
+      }
+    }))
+
+    setStatus('in wait')
   }
 
   return (
@@ -85,9 +101,6 @@ export default function DestinationAcceptance({ registerBackgroundFetchAsync, un
           underlayColor="#D39109"
           style={[styles.button, { marginRight: 4, backgroundColor: '#F5AD17' }]}
           onPress={() => { 
-            setOrdered(true)
-            registerBackgroundFetchAsync() 
-
             createCall()
           }}
         >
@@ -98,11 +111,10 @@ export default function DestinationAcceptance({ registerBackgroundFetchAsync, un
           underlayColor="#DDDDDD"
           style={[styles.button, { marginLeft: 4, backgroundColor: '#F0F0F0' }]}
           onPress={() => {
-            setOrdered(false)
-            unregisterBackgroundFetchAsync()
-
             dispatch(setDestination(null))
+
             setDirectionsView(false)
+
             fitUser()
           }}
         >

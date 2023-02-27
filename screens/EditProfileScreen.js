@@ -8,9 +8,9 @@ import * as ImagePicker from 'expo-image-picker'
 import { useDispatch, useSelector } from 'react-redux'
 import { selectUserInfo, selectUserToken, setUserInfo } from '../slices/authSlice'
 
-import { getFirestore, doc, updateDoc } from "firebase/firestore"
-import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
-import app from '../firebase'
+import { doc, updateDoc } from "firebase/firestore"
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { firestore, storage } from '../firebase'
 
 export default function EditProfileScreen({ navigation }) {
   const dispatch = useDispatch()
@@ -30,10 +30,7 @@ export default function EditProfileScreen({ navigation }) {
   }, [userInfo])
 
   const updateUserData = async () => {
-    const database = getFirestore(app)
-    const storage = getStorage(app)
-
-    await updateDoc(doc(database, "users", userToken), {
+    await updateDoc(doc(firestore, "users", userToken), {
       firstName: firstName,
       lastName: lastName,
       phone: phone,
