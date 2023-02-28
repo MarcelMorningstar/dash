@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { StyleSheet, Text, TouchableHighlight, View } from 'react-native'
 
 import { useDispatch, useSelector } from 'react-redux'
@@ -17,6 +17,7 @@ export default function DestinationAcceptance({ setStatus, setDirectionsView, fi
   const origin = useSelector(selectOrigin)
   const destination = useSelector(selectDestination)
   const travelInformation = useSelector(selectTravelInformation)
+  const [from, setFrom] = useState('')
 
   useEffect(() => {
     const setTravelInfo = async () => {
@@ -27,7 +28,16 @@ export default function DestinationAcceptance({ setStatus, setDirectionsView, fi
       })
     }
 
+    const setFromAddress = async () => {
+      fetch(`https://maps.googleapis.com/maps/api/geocode/json?latlng=${origin.latitude},${origin.longitude}&key=${GOOGLE_API_KEY}`)
+      .then(response => response.json())
+      .then(data => {
+        setFrom(data.results[0].formatted_address)
+      })
+    }
+
     setTravelInfo()
+    setFromAddress()
   }, [origin, destination, GOOGLE_API_KEY])
 
   const getDistance = (distance) => {
@@ -56,7 +66,8 @@ export default function DestinationAcceptance({ setStatus, setDirectionsView, fi
       user: {
         id: userToken,
         latitude: origin.latitude,
-        longitude: origin.longitude
+        longitude: origin.longitude,
+        address: from
       },
       destination: destination,
       travelInformation: {
