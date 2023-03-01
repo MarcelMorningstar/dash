@@ -3,7 +3,7 @@ import { Image, Keyboard, KeyboardAvoidingView, Platform, StatusBar, StyleSheet,
 
 import { FirebaseRecaptchaVerifierModal, FirebaseRecaptchaBanner } from 'expo-firebase-recaptcha';
 import { PhoneAuthProvider, signInWithCredential } from "firebase/auth"
-import { auth } from '../firebase'
+import { app, auth } from '../firebase'
 
 export default function LoginScreen() {
   const recaptchaVerifier = useRef(null)
