@@ -61,9 +61,12 @@ function BottomTabNavigator() {
       }}>
       <BottomTab.Screen
         name="History"
-        component={HistoryScreen}
+        component={() => {
+          return <HistoryScreen />
+        }}
         options={{
           tabBarIcon: ({ color }) => <FontAwesome5 name="history" color={color} size={24} style={{ marginBottom: -3 }} />,
+          headerShown: false
         }}
       />
       <BottomTab.Screen
