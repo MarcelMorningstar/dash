@@ -20,18 +20,22 @@ export default function EditProfileScreen({ navigation }) {
   const [firstName, setFirstName] = useState('')
   const [lastName, setLastName] = useState('')
   const [email, setEmail] = useState('')
-  const [image, setImage] = useState('')
-  const [picked, setPicked] = useState(null)
+  const [pickedImage, setPickedImage] = useState(null)
 
   useEffect(() => {
     setFirstName(userInfo.firstName)
     setLastName(userInfo.lastName)
     setEmail(userInfo.email)
-    setImage(userInfo.image)
   }, [userInfo])
 
   const updateUserData = async () => {
-    if (picked) {
+    await updateDoc(doc(firestore, "users", userToken), {
+      firstName: firstName,
+      lastName: lastName,
+      email: email,
+    })
+
+    if (pickedImage) {
       const blob = await new Promise((resolve, reject) => {
         const xhr = new XMLHttpRequest();
         xhr.onload = function() {
@@ -41,44 +45,53 @@ export default function EditProfileScreen({ navigation }) {
           reject(new TypeError('Network request failed'));
         };
         xhr.responseType = 'blob';
-        xhr.open('GET', picked, true);
+        xhr.open('GET', pickedImage, true);
         xhr.send(null);
       })
 
       const storageRef = ref(storage, `users/${userToken}`)
 
       uploadBytes(storageRef, blob).then(async (snapshot) => {
-        try {
-          let i = await getDownloadURL(ref(storage, `users/${userToken}`))
+        let i = await getDownloadURL(ref(storage, `users/${userToken}`))
 
-          setImage(i)
-        } catch(e) {  }
+        updateProfile(auth.currentUser, {
+          displayName: `${firstName} ${lastName}`, 
+          photoURL: i,
+        }).then(() => {
+          dispatch(setUserInfo({
+            name: `${firstName} ${lastName}`,
+            firstName: firstName,
+            lastName: lastName,
+            phone: auth.currentUser.phoneNumber,
+            email: email,
+            image: i,
+            thumbnail: pickedImage
+          }))
+    
+          navigation.navigate('Profile')
+        }).catch((error) => {
+          console.log(error)
+        });
+      });
+    } else {
+      updateProfile(auth.currentUser, {
+        displayName: `${firstName} ${lastName}`, 
+      }).then(() => {
+        dispatch(setUserInfo({
+          name: `${firstName} ${lastName}`,
+          firstName: firstName,
+          lastName: lastName,
+          phone: auth.currentUser.phoneNumber,
+          email: email,
+          image: i,
+          thumbnail: pickedImage
+        }))
+  
+        navigation.navigate('Profile')
+      }).catch((error) => {
+        console.log(error)
       });
     }
-
-    await updateDoc(doc(firestore, "users", userToken), {
-      firstName: firstName,
-      lastName: lastName,
-      email: email,
-    })
-
-    updateProfile(auth.currentUser, {
-      displayName: `${firstName} ${lastName}`, 
-      photoURL: picked ? image : userInfo.photoURL,
-    }).then(() => {
-      dispatch(setUserInfo({
-        name: `${firstName} ${lastName}`,
-        firstName: firstName,
-        lastName: lastName,
-        phone: auth.currentUser.phoneNumber,
-        email: email,
-        image: picked
-      }))
-
-      navigation.navigate('Profile')
-    }).catch((error) => {
-      console.log(error)
-    });
   }
 
   const pickImage = async () => {
@@ -91,7 +104,7 @@ export default function EditProfileScreen({ navigation }) {
     });
 
     if (!result.canceled) {
-      setPicked(result.assets[0].uri);
+      setPickedImage(result.assets[0].uri);
     }
   };
 
@@ -104,10 +117,10 @@ export default function EditProfileScreen({ navigation }) {
               <MaterialIcons name="edit" size={21} color='white' />
             </View>
             {
-              userInfo.image || image ?
+              userInfo.image || pickedImage ?
                 <Image
                   source={{
-                    uri: picked ? picked : userInfo.image + '?' + new Date(),
+                    uri: pickedImage ? pickedImage : userInfo.thumbnail,
                   }}
                   style={{
                     width: '100%',

@@ -32,7 +32,8 @@
     "react-native-webview": "11.23.1",
     "react-redux": "^8.0.5",
     "expo-splash-screen": "~0.17.5",
-    "expo-updates": "~0.15.6"
+    "expo-updates": "~0.15.6",
+    "expo-file-system": "~15.1.1"
   },
   "devDependencies": {
     "@babel/core": "^7.12.9",

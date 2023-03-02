@@ -1,6 +1,7 @@
 import React from "react";
 import * as SplashScreen from "expo-splash-screen";
 import * as Location from 'expo-location';
+import * as FileSystem from 'expo-file-system';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
@@ -20,8 +21,7 @@ import { setOrigin } from '../slices/mainSlice';
 
 import { onAuthStateChanged } from 'firebase/auth';
 import { doc, getDoc } from "firebase/firestore";
-import { getDownloadURL, ref } from "firebase/storage";
-import { auth, firestore, storage } from '../firebase';
+import { auth, firestore } from '../firebase';
 
 export default function Navigation() {
   return (
@@ -55,14 +55,18 @@ function RootNavigator() {
         }))
 
         const docSnap = await getDoc(doc(firestore, "users", user.uid))
+        const fileUri = FileSystem.documentDirectory + "photo";
         
+        FileSystem.downloadAsync(user.photoURL, fileUri)
+
         dispatch(setUserInfo({
           name: user.displayName,
           firstName: docSnap.data().firstName,
           lastName: docSnap.data().lastName,
           phone: user.phoneNumber,
           email: docSnap.data().email,
-          image: user.photoURL
+          image: user.photoURL,
+          thumbnail: fileUri
         }))
 
         dispatch(setUserToken(user.uid))

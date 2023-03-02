@@ -28,7 +28,7 @@ export default function ProfileScreen({ navigation }) {
             !!data.image ?
               <Image
                 source={{
-                  uri: data.image + '?' + new Date(),
+                  uri: data.thumbnail,
                 }}
                 style={{
                   width: '100%',
