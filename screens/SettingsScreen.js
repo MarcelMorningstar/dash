@@ -9,7 +9,7 @@ export default function SettingsScreen({ navigation }) {
   const [logout, setLogout] = useState(false);
 
   return (
-    <Layout title='Edit Profile' navigation={navigation} backScreen='Home'>
+    <Layout title='Settings' navigation={navigation} backScreen='Home'>
       <ScrollView>
         <SettingsSection title='Preferences'>
           <TouchableHighlight 

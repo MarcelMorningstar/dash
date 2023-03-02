@@ -1,11 +1,12 @@
-import React from 'react';
+import React from "react";
+import * as SplashScreen from "expo-splash-screen";
+import * as Location from 'expo-location';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 
 import { Ionicons, FontAwesome5, Feather } from '@expo/vector-icons';
 
-import SplashScreen from '../screens/SplashScreen';
 import LoginScreen from '../screens/LoginScreen';
 import HomeScreen from '../screens/HomeScreen';
 import HistoryScreen from '../screens/HistoryScreen';
@@ -13,8 +14,14 @@ import PaymentScreen from '../screens/PaymentScreen';
 import ProfileStackNavigator from './ProfileStackNavigator';
 import SettingsScreen from '../screens/SettingsScreen';
 
-import { useSelector } from 'react-redux';
-import { selectIsLoading, selectUserToken } from '../slices/authSlice';
+import { useDispatch, useSelector } from 'react-redux';
+import { selectUserToken, setUserInfo, setUserToken } from '../slices/authSlice';
+import { setOrigin } from '../slices/mainSlice';
+
+import { onAuthStateChanged } from 'firebase/auth';
+import { doc, getDoc } from "firebase/firestore";
+import { getDownloadURL, ref } from "firebase/storage";
+import { auth, firestore, storage } from '../firebase';
 
 export default function Navigation() {
   return (
@@ -27,12 +34,46 @@ export default function Navigation() {
 const Stack = createNativeStackNavigator()
 
 function RootNavigator() {
-  const isLoading = useSelector(selectIsLoading)
+  const dispatch = useDispatch()
   const userToken = useSelector(selectUserToken)
 
-  if (isLoading) {
-    return <SplashScreen />
-  }
+  onAuthStateChanged(auth, (user) => {
+    (async () => {
+      if (user) {
+        let { status } = await Location.requestForegroundPermissionsAsync()
+  
+        if (status !== 'granted') {
+          console.log('Permission to access location was denied')
+          return
+        }
+  
+        let location = await Location.getCurrentPositionAsync({})
+
+        dispatch(setOrigin({
+          latitude: location.coords.latitude,
+          longitude: location.coords.longitude
+        }))
+
+        const docSnap = await getDoc(doc(firestore, "users", user.uid))
+        let image = null
+
+        try {
+          image = await getDownloadURL(ref(storage, `users/${user.uid}`))
+        } catch(error) { }
+
+        dispatch(setUserInfo({
+          ...docSnap.data(),
+          image: image,
+        }))
+
+        dispatch(setUserToken(user.uid))
+      } else {
+        dispatch(setUserToken(null))
+      }
+
+      await SplashScreen.hideAsync();
+    })()
+  });
 
   return (
     <Stack.Navigator>
