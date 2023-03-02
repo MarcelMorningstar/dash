@@ -12,7 +12,8 @@
       "backgroundColor": "#ffffff"
     },
     "updates": {
-      "fallbackToCacheTimeout": 0
+      "fallbackToCacheTimeout": 0,
+      "url": "https://u.expo.dev/6b72b37c-1bfb-469e-9985-1f61728f878b"
     },
     "assetBundlePatterns": [
       "**/*"
@@ -24,7 +25,8 @@
           "location",
           "fetch"
         ]
-      }
+      },
+      "bundleIdentifier": "com.quentincoldwater.dash"
     },
     "android": {
       "adaptiveIcon": {
@@ -51,6 +53,9 @@
       "eas": {
         "projectId": "6b72b37c-1bfb-469e-9985-1f61728f878b"
       }
+    },
+    "runtimeVersion": {
+      "policy": "sdkVersion"
     }
   }
 }
