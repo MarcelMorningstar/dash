@@ -28,7 +28,7 @@ export default function ProfileScreen({ navigation }) {
             !!data.image ?
               <Image
                 source={{
-                  uri: data.image,
+                  uri: data.image + '?' + new Date(),
                 }}
                 style={{
                   width: '100%',
@@ -42,7 +42,7 @@ export default function ProfileScreen({ navigation }) {
           }
         </View>
 
-        <Text style={styles.name}>{ data.firstName + ' ' + data.lastName }</Text>
+        <Text style={styles.name}>{ data.name }</Text>
 
         <View style={styles.fieldContainer}>
           <View style={styles.field}>

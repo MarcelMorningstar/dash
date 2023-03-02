@@ -55,15 +55,14 @@ function RootNavigator() {
         }))
 
         const docSnap = await getDoc(doc(firestore, "users", user.uid))
-        let image = null
-
-        try {
-          image = await getDownloadURL(ref(storage, `users/${user.uid}`))
-        } catch(error) { }
-
+        
         dispatch(setUserInfo({
-          ...docSnap.data(),
-          image: image,
+          name: user.displayName,
+          firstName: docSnap.data().firstName,
+          lastName: docSnap.data().lastName,
+          phone: user.phoneNumber,
+          email: docSnap.data().email,
+          image: user.photoURL
         }))
 
         dispatch(setUserToken(user.uid))

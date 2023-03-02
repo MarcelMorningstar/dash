@@ -8,9 +8,10 @@ import * as ImagePicker from 'expo-image-picker'
 import { useDispatch, useSelector } from 'react-redux'
 import { selectUserInfo, selectUserToken, setUserInfo } from '../slices/authSlice'
 
+import { updateProfile } from "firebase/auth"
 import { doc, updateDoc } from "firebase/firestore"
-import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
-import { firestore, storage } from '../firebase'
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage"
+import { auth, firestore, storage } from '../firebase'
 
 export default function EditProfileScreen({ navigation }) {
   const dispatch = useDispatch()
@@ -18,26 +19,19 @@ export default function EditProfileScreen({ navigation }) {
   const userToken = useSelector(selectUserToken)
   const [firstName, setFirstName] = useState('')
   const [lastName, setLastName] = useState('')
-  const [phone, setPhone] = useState('')
   const [email, setEmail] = useState('')
-  const [image, setImage] = useState(null);
+  const [image, setImage] = useState('')
+  const [picked, setPicked] = useState(null)
 
   useEffect(() => {
     setFirstName(userInfo.firstName)
     setLastName(userInfo.lastName)
-    setPhone(userInfo.phone)
     setEmail(userInfo.email)
+    setImage(userInfo.image)
   }, [userInfo])
 
   const updateUserData = async () => {
-    await updateDoc(doc(firestore, "users", userToken), {
-      firstName: firstName,
-      lastName: lastName,
-      phone: phone,
-      email: email
-    })
-
-    if (image) {
+    if (picked) {
       const blob = await new Promise((resolve, reject) => {
         const xhr = new XMLHttpRequest();
         xhr.onload = function() {
@@ -47,7 +41,7 @@ export default function EditProfileScreen({ navigation }) {
           reject(new TypeError('Network request failed'));
         };
         xhr.responseType = 'blob';
-        xhr.open('GET', image, true);
+        xhr.open('GET', picked, true);
         xhr.send(null);
       })
 
@@ -62,17 +56,29 @@ export default function EditProfileScreen({ navigation }) {
       });
     }
 
-    dispatch(setUserInfo({
+    await updateDoc(doc(firestore, "users", userToken), {
       firstName: firstName,
       lastName: lastName,
-      phone: phone,
       email: email,
-      image: image ? image : userInfo.image,
-      addresses: userInfo.addresses,
-      cash: userInfo.cash,
-    }))
+    })
 
-    navigation.navigate('Profile')
+    updateProfile(auth.currentUser, {
+      displayName: `${firstName} ${lastName}`, 
+      photoURL: picked ? image : userInfo.photoURL,
+    }).then(() => {
+      dispatch(setUserInfo({
+        name: `${firstName} ${lastName}`,
+        firstName: firstName,
+        lastName: lastName,
+        phone: auth.currentUser.phoneNumber,
+        email: email,
+        image: picked
+      }))
+
+      navigation.navigate('Profile')
+    }).catch((error) => {
+      console.log(error)
+    });
   }
 
   const pickImage = async () => {
@@ -85,7 +91,7 @@ export default function EditProfileScreen({ navigation }) {
     });
 
     if (!result.canceled) {
-      setImage(result.assets[0].uri);
+      setPicked(result.assets[0].uri);
     }
   };
 
@@ -101,7 +107,7 @@ export default function EditProfileScreen({ navigation }) {
               userInfo.image || image ?
                 <Image
                   source={{
-                    uri: image ? image : userInfo.image,
+                    uri: picked ? picked : userInfo.image + '?' + new Date(),
                   }}
                   style={{
                     width: '100%',
@@ -127,13 +133,6 @@ export default function EditProfileScreen({ navigation }) {
             placeholder='Last Name'
             onChangeText={setLastName}
             value={lastName}
-            style={styles.input}
-          />
-
-          <TextInput 
-            placeholder='Phone Number'
-            onChangeText={setPhone}
-            value={phone}
             style={styles.input}
           />
 
