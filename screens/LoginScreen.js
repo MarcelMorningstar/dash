@@ -69,10 +69,10 @@ export default function LoginScreen() {
           <Image 
             style={{
               flex: 4,
-              width: '32%',
+              width: '42%',
               resizeMode: 'contain'
             }}
-            source={require("../assets/logo.png")}
+            source={require("../assets/icon.png")}
           />
           
           <View style={{ flex: 6, width: '70%' }}>
