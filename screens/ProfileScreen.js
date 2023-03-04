@@ -1,8 +1,11 @@
 import React, { useState } from 'react'
 import { Image, StyleSheet, Text, TouchableHighlight, TouchableOpacity, View } from 'react-native'
-import { MaterialIcons, MaterialCommunityIcons, FontAwesome5, Entypo, Feather } from '@expo/vector-icons'
+import { MaterialIcons, MaterialCommunityIcons, FontAwesome5, Feather, AntDesign, Ionicons } from '@expo/vector-icons'
+
 import Layout from '../components/Layout'
 import Logout from '../components/Logout'
+import SectionLine from '../components/SectionLine'
+import ButtonLine from '../components/ButtonLine'
 
 import { useSelector } from 'react-redux'
 import { selectUserInfo } from '../slices/authSlice'
@@ -68,7 +71,7 @@ export default function ProfileScreen({ navigation }) {
           }
         </View>
 
-        <View style={styles.line} />
+        <SectionLine />
 
         <View style={styles.fieldContainer}>
           <Text style={{ marginBottom: 8, fontSize: 15, fontWeight: '500' }}>My locations</Text>
@@ -77,24 +80,26 @@ export default function ProfileScreen({ navigation }) {
             onPress={() => {}}
           >
             <View style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
-              <Entypo name="home" size={28} color="black" style={{ marginRight: 12 }} />
+              <AntDesign name="home" size={28} color="black" style={{ marginRight: 12 }} />
               <Text style={{ fontSize: 14 }}>Enter home location</Text>
             </View>
           </TouchableOpacity>
 
-          <View style={styles.line2} />
+          <ButtonLine />
 
           <TouchableOpacity
             style={styles.btn}
             onPress={() => {}}
           >
             <View style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
-              <MaterialIcons name="work" size={28} color="black" style={{ marginRight: 12 }} />
+              <Ionicons name="briefcase-outline" size={28} color="black" style={{ marginRight: 12 }} />
               <Text style={{ fontSize: 14 }}>Enter work location</Text>
             </View>
           </TouchableOpacity>
         </View>
-        <View style={styles.line} />
+
+        <SectionLine />
+        
         <View style={styles.fieldContainer}>
           <TouchableOpacity
             style={styles.btn}
@@ -159,16 +164,5 @@ const styles = StyleSheet.create({
     height: 44, 
     paddingHorizontal: 8, 
     justifyContent: 'center'
-  },
-  line: {
-    width: '100%', 
-    height: 5, 
-    backgroundColor: '#DDDDDD'
-  },
-  line2: {
-    width: '100%', 
-    height: 1.4, 
-    backgroundColor: '#DDDDDD',
-    borderRadius: 4
   }
 })
