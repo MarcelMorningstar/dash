@@ -117,6 +117,7 @@ function BottomTabNavigator() {
         component={PaymentScreen}
         options={{
           tabBarIcon: ({ color }) => <Ionicons name="card-outline" color={color} size={30} style={{ marginBottom: -3 }} />,
+          headerShown: false,
         }}
       />
       <BottomTab.Screen
