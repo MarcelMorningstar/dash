@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react'
-import { Image, ScrollView, StyleSheet, Text, TextInput, TouchableHighlight, TouchableWithoutFeedback, View } from 'react-native'
+import { Image, ScrollView, StyleSheet, Text, TouchableHighlight, TouchableWithoutFeedback, View } from 'react-native'
+import { Div2, TextInput, TouchableHighlight2 } from '../components/Themed'
 import { FontAwesome5, MaterialIcons } from '@expo/vector-icons'
 import Layout from '../components/Layout'
 
@@ -83,8 +84,8 @@ export default function EditProfileScreen({ navigation }) {
           lastName: lastName,
           phone: auth.currentUser.phoneNumber,
           email: email,
-          image: i,
-          thumbnail: pickedImage
+          image: userInfo.image,
+          thumbnail: userInfo.thumbnail
         }))
   
         navigation.navigate('Profile')
@@ -113,9 +114,9 @@ export default function EditProfileScreen({ navigation }) {
       <ScrollView contentContainerStyle={styles.container}>
         <TouchableWithoutFeedback onPress={pickImage}>
           <View style={styles.picContainer}>
-            <View style={{ position: 'absolute', zIndex: 10, top: 0, right: 0, padding: 4, backgroundColor: '#F5AD17', borderRadius: 20 }}>
+            <Div2 style={{ position: 'absolute', zIndex: 10, top: 0, right: 0, padding: 4, borderRadius: 20 }}>
               <MaterialIcons name="edit" size={21} color='white' />
-            </View>
+            </Div2>
             {
               userInfo.image || pickedImage ?
                 <Image
@@ -157,14 +158,13 @@ export default function EditProfileScreen({ navigation }) {
           />
         </View>
 
-        <TouchableHighlight
+        <TouchableHighlight2
           activeOpacity={0.6}
-          underlayColor="#D39109"
           style={styles.saveBtn}
           onPress={updateUserData}
         >
           <Text style={{ color: 'white', fontSize: 24, fontWeight: '500' }}>Save</Text>
-        </TouchableHighlight>
+        </TouchableHighlight2>
       </ScrollView>
     </Layout>
   )
@@ -193,7 +193,6 @@ const styles = StyleSheet.create({
   input: {
     width: '100%',
     height: 48,
-    backgroundColor: '#DDDDDD',
     marginVertical: 4,
     paddingHorizontal: 16,
     fontSize: 16,
@@ -205,7 +204,6 @@ const styles = StyleSheet.create({
     width: '80%',
     height: 50,
     marginVertical: 16,
-    backgroundColor: '#F5AD17',
     borderRadius: 12
   }
 })

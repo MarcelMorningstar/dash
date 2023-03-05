@@ -1,23 +1,27 @@
 import React, { useEffect, useRef, useState } from 'react'
-import { Modal, PixelRatio, Platform, StyleSheet, Text, TouchableHighlight, TouchableOpacity, View } from 'react-native'
-import * as BackgroundFetch from 'expo-background-fetch';
-import * as TaskManager from 'expo-task-manager';
-import * as Location from 'expo-location';
+import { Appearance, PixelRatio, Platform, StyleSheet, Text, View } from 'react-native'
+import { TouchableHighlight } from '../components/Themed'
+import * as BackgroundFetch from 'expo-background-fetch'
+import * as TaskManager from 'expo-task-manager'
+import * as Location from 'expo-location'
 import { FontAwesome5, MaterialIcons } from '@expo/vector-icons'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
-import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps'
+import { Marker } from 'react-native-maps'
 import MapViewDirections from 'react-native-maps-directions'
 
+import Map from '../components/Map'
 import DriverMarker from '../components/DriverMarker'
 import SlideInMenu from '../components/order/SlideInMenu'
 import DestinationChoice from '../components/order/DestinationChoice'
 import DestinationAcceptance from '../components/order/DestinationAcceptance'
-import ProcessingOrder from '../components/order/ProcessingOrder';
+import ProcessingOrder from '../components/order/ProcessingOrder'
+
+import Colors from '../constants/Colors'
 
 import { useSelector, useDispatch } from 'react-redux'
 import { selectDestination, selectOrigin, setDestination, setOrigin } from '../slices/mainSlice'
 import { selectUserInfo, selectUserToken } from '../slices/authSlice'
-import { selectOrderInformation, selectOrderToken, setOrderInformation, setOrderToken } from '../slices/orderSlice';
+import { selectOrderInformation, selectOrderToken, setOrderInformation, setOrderToken } from '../slices/orderSlice'
 
 import { collection, query, where, onSnapshot, doc, updateDoc } from "firebase/firestore";
 import { ref, set } from "firebase/database"
@@ -28,6 +32,7 @@ import { GOOGLE_API_KEY } from '@env'
 const BACKGROUND_FETCH_TASK = 'background-location-task';
 
 export default function HomeScreen() {
+  const theme = Appearance.getColorScheme();
   const insets = useSafeAreaInsets()
   const mapRef = useRef(null)
   const childRef = useRef(null)
@@ -45,9 +50,6 @@ export default function HomeScreen() {
   let userLoactionUpdateInterval = useRef()
 
   const styles = StyleSheet.create({
-    map: {
-      flex: 1
-    },
     inputContainer: {
       position: 'absolute',
       left: 0,
@@ -63,7 +65,6 @@ export default function HomeScreen() {
       backgroundColor: "#FFF",
       borderRadius: 16,
       elevation: 4,
-      shadowColor: 'black',
       shadowOffset: { width: 0, height: 1 },
       shadowOpacity: 0.25
     },
@@ -80,7 +81,6 @@ export default function HomeScreen() {
       backgroundColor: 'white',
       borderRadius: 25,
       elevation: 7,
-      shadowColor: 'black',
       shadowOffset: { width: 0, height: 0 },
       shadowOpacity: 0.25
     }
@@ -224,7 +224,7 @@ export default function HomeScreen() {
     }, 1)
   }
 
-  const fitDerection = (deley) => {
+  const fitDerection = (delay) => {
     setTimeout(() => {
       mapRef.current.fitToSuppliedMarkers(['origin', 'destination'], {
         edgePadding: {
@@ -234,16 +234,15 @@ export default function HomeScreen() {
           bottom: Platform.OS === 'android' ? PixelRatio.getPixelSizeForLayoutSize(destinationMenu ? 330 : 0) : destinationMenu ? 400 : 70
         }
       })
-    }, deley)
+    }, delay)
   }
   
   return (
-    <View behavior={Platform.OS === "ios" ? "padding" : "height"} style={styles.map}>
+    <View behavior={Platform.OS === "ios" ? "padding" : "height"} style={{ flex: 1 }}>
       {
         !destination ? (
           <TouchableHighlight
             activeOpacity={0.6}
-            underlayColor="#DDDDDD"
             style={styles.centerBtn}
             onPress={fitUser}
           >
@@ -252,7 +251,6 @@ export default function HomeScreen() {
         ) : (
           <TouchableHighlight
             activeOpacity={0.6}
-            underlayColor="#DDDDDD"
             style={styles.centerBtn}
             onPress={() => fitDerection(100)}
           >
@@ -261,27 +259,7 @@ export default function HomeScreen() {
         )
       }
       
-      <MapView
-        ref={mapRef}
-        initialRegion={{
-          latitude: origin.latitude,
-          longitude: origin.longitude,
-          latitudeDelta: 0.018,
-          longitudeDelta: 0.012,
-        }}
-        provider={PROVIDER_GOOGLE}
-        showsUserLocation={!directionsView}
-        onUserLocationChange={coordinate => userLocationChange(coordinate)}
-        showsMyLocationButton={false}
-        rotateEnabled={false}
-        pitchEnabled={false}
-        mapType='mutedStandard'
-        mapPadding={{
-          top: insets.top,
-          bottom: destinationMenu ? 330 : 0,
-        }}
-        style={styles.map}
-      >
+      <Map mapRef={mapRef} origin={origin} directionsView={directionsView} destinationMenu={destinationMenu} userLocationChange={userLocationChange} insets={insets}>
         {
           !directionsView && (
             drivers.map(driver => {
@@ -323,11 +301,11 @@ export default function HomeScreen() {
               destination={destination}
               apikey={GOOGLE_API_KEY}
               strokeWidth={4}
-              strokeColor="black"
+              strokeColor={Colors[theme]['primary']}
             />
           )
         }
-      </MapView>
+      </Map>
 
       {
         !directionsView && (
@@ -336,7 +314,7 @@ export default function HomeScreen() {
               activeOpacity={0.6}
               underlayColor="#DDDDDD"
               style={styles.inputField} 
-              onPress={ () => setDestinationMenu(true) }
+              onPress={() => setDestinationMenu(true)}
             >
               <Text style={{ fontSize: 18, color: 'rgba(0, 0, 0, .4)' }}>Destination</Text>
             </TouchableHighlight>

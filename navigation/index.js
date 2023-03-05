@@ -1,8 +1,10 @@
 import React from "react";
+import { Appearance } from 'react-native';
 import * as SplashScreen from "expo-splash-screen";
 import * as Location from 'expo-location';
 import * as FileSystem from 'expo-file-system';
-import { NavigationContainer } from '@react-navigation/native';
+
+import { NavigationContainer, DarkTheme, Theme } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 
@@ -15,6 +17,8 @@ import PaymentScreen from '../screens/PaymentScreen';
 import ProfileStackNavigator from './ProfileStackNavigator';
 import SettingsScreen from '../screens/SettingsScreen';
 
+import Colors from "../constants/Colors";
+
 import { useDispatch, useSelector } from 'react-redux';
 import { selectUserToken, setUserInfo, setUserToken } from '../slices/authSlice';
 import { setOrigin } from '../slices/mainSlice';
@@ -23,9 +27,11 @@ import { onAuthStateChanged } from 'firebase/auth';
 import { doc, getDoc } from "firebase/firestore";
 import { auth, firestore } from '../firebase';
 
+const theme = Appearance.getColorScheme()
+
 export default function Navigation() {
   return (
-    <NavigationContainer>
+    <NavigationContainer theme={theme === 'dark' ? DarkTheme : Theme}>
       <RootNavigator />
     </NavigationContainer>
   )
@@ -102,6 +108,7 @@ function BottomTabNavigator() {
       backBehavior='history'
       screenOptions={{
         tabBarShowLabel: false,
+        tabBarActiveTintColor: Colors[theme]['primary']
       }}>
       <BottomTab.Screen
         name="History"
@@ -109,7 +116,7 @@ function BottomTabNavigator() {
         options={{
           tabBarIcon: ({ color }) => <FontAwesome5 name="history" color={color} size={24} style={{ marginBottom: -3 }} />,
           headerShown: false,
-          unmountOnBlur: true
+          unmountOnBlur: true,
         }}
       />
       <BottomTab.Screen
@@ -125,7 +132,7 @@ function BottomTabNavigator() {
         component={HomeScreen}
         options={{
           tabBarIcon: ({ color }) => <Ionicons name="car-outline" color={color} size={40} style={{ marginBottom: -3 }} />,
-          headerShown: false
+          headerShown: false,
         }}
       />
       <BottomTab.Screen
@@ -133,7 +140,7 @@ function BottomTabNavigator() {
         component={ProfileStackNavigator}
         options={{
           tabBarIcon: ({ color }) => <Feather name="user" color={color} size={30} style={{ marginBottom: -3 }} />,
-          headerShown: false
+          headerShown: false,
         }}
       />
       <BottomTab.Screen
@@ -141,7 +148,7 @@ function BottomTabNavigator() {
         component={SettingsScreen}
         options={{
           tabBarIcon: ({ color }) => <Ionicons name="settings-outline" color={color} size={30} style={{ marginBottom: -3 }} />,
-          headerShown: false
+          headerShown: false,
         }}
       /> 
     </BottomTab.Navigator>

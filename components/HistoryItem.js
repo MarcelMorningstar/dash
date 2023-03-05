@@ -1,5 +1,6 @@
 import React, { useState} from 'react'
-import { StyleSheet, Text, TouchableWithoutFeedback, View} from 'react-native'
+import { StyleSheet, TouchableWithoutFeedback, View} from 'react-native'
+import { Div, Text } from './Themed';
 import Moment from 'moment';
 
 function Directions({ display, addressFrom, addressTo }) {
@@ -10,7 +11,7 @@ function Directions({ display, addressFrom, addressTo }) {
         <View style={[styles.row, { position: 'relative', display: display ? 'flex' : 'none', marginTop: 4, marginLeft: 64 }]}>
             {
                 top != 0 && b != 0 && (
-                    <View style={{ position: 'absolute', top: top, left: -5, width: 8, height: 8 + top + b / 1.8, borderTopWidth: 1, borderBottomWidth: 1, borderLeftWidth: 1 }}></View>
+                    <Div style={{ position: 'absolute', top: top, left: -5, width: 8, height: 8 + top + b / 1.8, backgroundColor: 'transparent', borderTopWidth: 1, borderBottomWidth: 1, borderLeftWidth: 1 }} />
                 )
             }
             <View>

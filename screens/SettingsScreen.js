@@ -1,12 +1,14 @@
 import React, { useState } from 'react'
-import { ScrollView, StyleSheet, Text, TouchableHighlight, View } from 'react-native'
-import { Feather, FontAwesome5, Ionicons } from '@expo/vector-icons'
+import { Appearance, ScrollView, StyleSheet, View } from 'react-native'
+import { Feather, FontAwesome5, Ionicons, Text, TouchableHighlight } from '../components/Themed'
+
 import Layout from '../components/Layout'
 import SettingsSection from '../components/SettingsSection'
 import Logout from '../components/Logout'
 
 export default function SettingsScreen({ navigation }) {
-  const [logout, setLogout] = useState(false);
+  const theme = Appearance.getColorScheme()
+  const [logout, setLogout] = useState(false)
 
   return (
     <Layout title='Settings' navigation={navigation} backScreen='Home'>
@@ -14,7 +16,6 @@ export default function SettingsScreen({ navigation }) {
         <SettingsSection title='Preferences'>
           <TouchableHighlight 
             activeOpacity={0.6}
-            underlayColor="#DDDDDD"
             style={styles.option}
             onPress={() => {}}
           >
@@ -29,7 +30,6 @@ export default function SettingsScreen({ navigation }) {
 
           <TouchableHighlight 
             activeOpacity={0.6}
-            underlayColor="#DDDDDD"
             style={styles.option}
             onPress={() => {}}
           >
@@ -38,7 +38,7 @@ export default function SettingsScreen({ navigation }) {
                 <FontAwesome5 name="moon" size={24} style={styles.optionIcon} />
                 <Text style={styles.optionText}>Theme</Text>
               </View>
-              <Text style={styles.optionText}>Value</Text>
+              <Text style={styles.optionText}>{ theme }</Text>
             </View>
           </TouchableHighlight>
         </SettingsSection>
@@ -46,7 +46,6 @@ export default function SettingsScreen({ navigation }) {
         <SettingsSection title='Account Action'>
           <TouchableHighlight 
             activeOpacity={0.6}
-            underlayColor="#DDDDDD"
             style={styles.option}
             onPress={() => navigation.navigate('ProfileStackNavigator', { screen: 'EditProfile' })}
           >
@@ -58,7 +57,6 @@ export default function SettingsScreen({ navigation }) {
 
           <TouchableHighlight 
             activeOpacity={0.6}
-            underlayColor="#DDDDDD"
             style={styles.option}
             onPress={() => {}}
           >
@@ -70,7 +68,6 @@ export default function SettingsScreen({ navigation }) {
 
           <TouchableHighlight 
             activeOpacity={0.6}
-            underlayColor="#DDDDDD"
             style={styles.option}
             onPress={() => setLogout(true)}
           >
@@ -106,6 +103,7 @@ const styles = StyleSheet.create({
     marginRight: 8
   },
   optionText: {
-    fontSize: 16
+    fontSize: 16,
+    textTransform: 'capitalize'
   }
 })

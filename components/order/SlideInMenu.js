@@ -1,11 +1,14 @@
 import React, { forwardRef, useEffect, useImperativeHandle, useRef } from 'react'
-import { Animated, Keyboard, Text, TouchableHighlight, View } from 'react-native'
-import { Ionicons } from '@expo/vector-icons';
+import { Animated, Appearance, Keyboard, View } from 'react-native'
+import { Text, TouchableHighlight, Ionicons } from '../Themed';
+
+import Colors from '../../constants/Colors';
 
 import { useDispatch } from 'react-redux'
 import { setDestination } from '../../slices/mainSlice'
 
 const SlideInMenu = forwardRef((props, ref) => {
+  const theme = Appearance.getColorScheme();
   const dispatch = useDispatch()
   const slideIn = useRef(new Animated.Value(0)).current
   const fadeIn = useRef(new Animated.Value(0)).current
@@ -91,7 +94,7 @@ const SlideInMenu = forwardRef((props, ref) => {
           width: '100%',
           height: props.size,
           padding: 4,
-          backgroundColor: '#FFF',
+          backgroundColor: Colors[theme]['background'],
           borderTopLeftRadius: 12,
           borderTopRightRadius: 12,
         }}
@@ -99,11 +102,10 @@ const SlideInMenu = forwardRef((props, ref) => {
         <View style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
           <TouchableHighlight 
             activeOpacity={0.6}
-            underlayColor="#DDDDDD"
             style={{ borderRadius: 32 }}
             onPress={handleClose}
           >
-            <Ionicons name="close" size={35} color="black" />
+            <Ionicons name="close" size={35} />
           </TouchableHighlight>
           
           <Text style={{ marginLeft: 4, fontSize: 21, fontWeight: '600' }}>{props.title}</Text>

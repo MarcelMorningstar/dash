@@ -1,23 +1,22 @@
 import React from 'react'
-import { SafeAreaView, StyleSheet, Text, TouchableHighlight, View } from 'react-native'
-import { Ionicons } from '@expo/vector-icons'
+import { StyleSheet, View } from 'react-native'
+import { Ionicons, SafeAreaView, Text, TouchableHighlight } from './Themed'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
 export default function Layout({ navigation, backScreen, children, title }) {
   const insets = useSafeAreaInsets()
 
   return (
-    <SafeAreaView style={{ flex: 1, paddingTop: insets.top, backgroundColor: '#F5F5F5' }}>
+    <SafeAreaView style={{ flex: 1, paddingTop: insets.top }}>
       <View style={styles.head}>
         <TouchableHighlight
           activeOpacity={0.6}
-          underlayColor="#DDDDDD"
           style={styles.back}
           onPress={() => { 
             backScreen ? navigation.navigate(backScreen) : navigation.goBack() 
           }}
         >
-          <Ionicons name="arrow-back" size={32} color='black' />
+          <Ionicons name="arrow-back" size={32} />
         </TouchableHighlight>
         <Text style={styles.title}>{ title }</Text>
       </View>

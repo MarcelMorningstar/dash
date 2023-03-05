@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react'
-import { StyleSheet, Text, TouchableHighlight, View } from 'react-native'
+import { StyleSheet, TouchableHighlight, View } from 'react-native'
+import { Text, TouchableHighlight2 } from '../Themed'
 
 import { useDispatch, useSelector } from 'react-redux'
 import { selectDestination, selectOrigin, selectTravelInformation, setDestination, setTravelInformation } from '../../slices/mainSlice'
@@ -107,20 +108,19 @@ export default function DestinationAcceptance({ setStatus, setDirectionsView, fi
         </Text>
       </View>
       <View style={styles.buttonContainer}>
-        <TouchableHighlight
+        <TouchableHighlight2
           activeOpacity={0.8}
-          underlayColor="#D39109"
-          style={[styles.button, { marginRight: 4, backgroundColor: '#F5AD17' }]}
+          style={[styles.button, { marginRight: 4 }]}
           onPress={() => { 
             createCall()
           }}
         >
           <Text style={{ color: 'white', fontWeight: '500' }}>Accept</Text>
-        </TouchableHighlight>
+        </TouchableHighlight2>
         <TouchableHighlight
           activeOpacity={0.8}
-          underlayColor="#DDDDDD"
-          style={[styles.button, { marginLeft: 4, backgroundColor: '#F0F0F0' }]}
+          underlayColor="#6A6A6A"
+          style={[styles.button, { marginLeft: 4, backgroundColor: '#555555' }]}
           onPress={() => {
             dispatch(setDestination(null))
 
@@ -129,7 +129,7 @@ export default function DestinationAcceptance({ setStatus, setDirectionsView, fi
             fitUser()
           }}
         >
-          <Text style={{ color: 'black', fontWeight: '500' }}>Cancel</Text>
+          <Text style={{ color: 'white', fontWeight: '500' }}>Cancel</Text>
         </TouchableHighlight>
       </View>
     </View>

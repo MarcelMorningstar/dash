@@ -1,5 +1,6 @@
-import { StyleSheet, Text, TouchableHighlight, View } from 'react-native'
 import React from 'react'
+import { StyleSheet, TouchableHighlight, View } from 'react-native'
+import { Text } from '../Themed'
 
 export default function ProcessingOrder({ orderToken, orderInformation, cancelOrder, setDirectionsView, colseSlideIn }) {
   return (
@@ -12,7 +13,7 @@ export default function ProcessingOrder({ orderToken, orderInformation, cancelOr
       <View>
         <TouchableHighlight
           activeOpacity={0.6}
-          underlayColor="#DDDDDD"
+          underlayColor="#6A6A6A"
           style={{ 
             display: 'flex', 
             alignItems: 'center',
@@ -20,7 +21,7 @@ export default function ProcessingOrder({ orderToken, orderInformation, cancelOr
             width: '100%', 
             height: 50, 
             paddingHorizontal: 16, 
-            backgroundColor: '#F0F0F0', 
+            backgroundColor: '#555555', 
             borderRadius: 12 
           }}
           onPress={() => {
@@ -29,7 +30,7 @@ export default function ProcessingOrder({ orderToken, orderInformation, cancelOr
             setDirectionsView(false)
           }}
         >
-          <Text style={{ color: 'black', fontSize: 18, fontWeight: '500' }}>Cancel</Text>
+          <Text style={{ color: 'white', fontSize: 18, fontWeight: '500' }}>Cancel</Text>
         </TouchableHighlight>
       </View>
     </View>

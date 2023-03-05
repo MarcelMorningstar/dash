@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react'
-import { StyleSheet, Text, View } from 'react-native'
+import { StyleSheet, View } from 'react-native'
+import { Div, Text } from '../Themed'
 import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete'
 
 import { useDispatch, useSelector } from 'react-redux'
@@ -10,8 +11,6 @@ import { GOOGLE_API_KEY } from '@env'
 export default function DestinationChoice({ setDirectionsView, fitDerection }) {
   const [value, setValue] = useState('')
   const dispatch = useDispatch()
-  const origin = useSelector(selectOrigin)
-  const destination = useSelector(selectDestination)
 
   useEffect(() => {
     return () => {
@@ -21,19 +20,18 @@ export default function DestinationChoice({ setDirectionsView, fitDerection }) {
   
   return (
     <View>
-      <View
+      <Div
         style={{
           display: 'flex',
           justifyContent: 'center',
           height: 44,
           marginVertical: 4,
           paddingHorizontal: 12,
-          backgroundColor: '#D7D7D7',
           borderRadius: 12
         }}
       >
         <Text style={{ fontSize: 18 }}>My Location</Text>
-      </View>
+      </Div>
 
       {
         (

@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
-import { Feather, FontAwesome5, MaterialIcons } from '@expo/vector-icons'
+import { StyleSheet, TouchableOpacity, View } from 'react-native'
+import { Div2, Feather, FontAwesome5, MaterialIcons, Text } from '../components/Themed'
 
 import Layout from '../components/Layout'
 import SectionLine from '../components/SectionLine'
@@ -21,7 +21,7 @@ export default function PaymentScreen({ navigation }) {
           <View>
             <TouchableOpacity style={styles.btn} onPress={() => {}}>
               <View style={[styles.row, { alignItems: 'center' }]}>
-                <MaterialIcons name="local-atm" size={28} color="black" style={{ marginRight: 12 }} />
+                <MaterialIcons name="local-atm" size={28} style={{ marginRight: 12 }} />
                 <Text style={{ fontSize: 14 }}>Add Balance</Text>
               </View>
             </TouchableOpacity>
@@ -30,7 +30,7 @@ export default function PaymentScreen({ navigation }) {
 
             <TouchableOpacity style={styles.btn} onPress={() => {}}>
               <View style={[styles.row, { alignItems: 'center' }]}>
-                <Feather name="clock" size={28} color="black" style={{ marginRight: 12 }} />
+                <Feather name="clock" size={28} style={{ marginRight: 12 }} />
                 <Text style={{ fontSize: 14 }}>See Transactions</Text>
               </View>
             </TouchableOpacity>
@@ -46,11 +46,11 @@ export default function PaymentScreen({ navigation }) {
             <TouchableOpacity style={styles.btn} onPress={() => setMethod('card')}>
               <View style={[styles.row, { justifyContent: 'space-between', alignItems: 'center' }]}>
                 <View style={[styles.row, { alignItems: 'center' }]}>
-                  <MaterialIcons name="credit-card" size={28} color="black" style={{ marginRight: 12 }} />
+                  <MaterialIcons name="credit-card" size={28} style={{ marginRight: 12 }} />
                   <Text style={{ fontSize: 14 }}>Bank Card</Text>
                 </View>
                 {
-                  method == 'card' && <View style={styles.circle} />
+                  method == 'card' && <Div2 style={styles.circle} />
                 }
               </View>
             </TouchableOpacity>
@@ -60,11 +60,11 @@ export default function PaymentScreen({ navigation }) {
             <TouchableOpacity style={styles.btn} onPress={() => setMethod('balance')}>
               <View style={[styles.row, { justifyContent: 'space-between', alignItems: 'center' }]}>
                 <View style={[styles.row, { alignItems: 'center' }]}>
-                  <MaterialIcons name="local-atm" size={28} color="black" style={{ marginRight: 12 }} />
+                  <MaterialIcons name="local-atm" size={28} style={{ marginRight: 12 }} />
                   <Text style={{ fontSize: 14 }}>App Balance</Text>
                 </View>
                 {
-                  method == 'balance' && <View style={styles.circle} />
+                  method == 'balance' && <Div2 style={styles.circle} />
                 }
               </View>
             </TouchableOpacity>
@@ -74,11 +74,11 @@ export default function PaymentScreen({ navigation }) {
             <TouchableOpacity style={styles.btn} onPress={() => setMethod('cash')}>
               <View style={[styles.row, { justifyContent: 'space-between', alignItems: 'center' }]}>
                 <View style={[styles.row, { alignItems: 'center' }]}>
-                  <FontAwesome5 name="money-bill-wave" size={22} color="black" style={{ marginRight: 12 }} />
+                  <FontAwesome5 name="money-bill-wave" size={22} style={{ marginRight: 12 }} />
                   <Text style={{ fontSize: 14 }}>Cash</Text>
                 </View>
                 {
-                  method == 'cash' && <View style={styles.circle} />
+                  method == 'cash' && <Div2 style={styles.circle} />
                 }
               </View>
             </TouchableOpacity>
@@ -114,8 +114,8 @@ const styles = StyleSheet.create({
   circle: {
     width: 21,
     height: 21,
-    borderWidth: 7,
+    backgroundColor: 'transparant',
+    borderWidth: 5,
     borderRadius: 12,
-    borderColor: '#F5AD17'
   }
 })

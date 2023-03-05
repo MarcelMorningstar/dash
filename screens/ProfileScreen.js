@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
-import { Image, StyleSheet, Text, TouchableHighlight, TouchableOpacity, View } from 'react-native'
-import { MaterialIcons, MaterialCommunityIcons, FontAwesome5, Feather, AntDesign, Ionicons } from '@expo/vector-icons'
+import { Image, StyleSheet, TouchableOpacity, View } from 'react-native'
+import { AntDesign, Feather, FontAwesome5, Ionicons, MaterialCommunityIcons, MaterialIcons, Text, TouchableHighlight } from '../components/Themed'
 
 import Layout from '../components/Layout'
 import Logout from '../components/Logout'
@@ -19,11 +19,10 @@ export default function ProfileScreen({ navigation }) {
       <View style={styles.container}>
         <TouchableHighlight
           activeOpacity={0.6}
-          underlayColor="#DDDDDD"
           style={styles.edit}
           onPress={() => navigation.navigate('EditProfile')}
         >
-          <MaterialIcons name="edit" size={28} color='black' />
+          <MaterialIcons name="edit" size={28} />
         </TouchableHighlight>
 
         <View style={styles.picContainer}>
@@ -52,7 +51,6 @@ export default function ProfileScreen({ navigation }) {
             <MaterialIcons 
               name="smartphone" 
               size={30} 
-              color='black' 
               style={{ marginRight: 12 }} 
             />
             <Text style={styles.textField}>{ data.phone }</Text>
@@ -63,7 +61,6 @@ export default function ProfileScreen({ navigation }) {
               <MaterialCommunityIcons 
                 name="email-outline" 
                 size={30} 
-                color='black' 
                 style={{ marginRight: 12 }} 
               />
               <Text style={styles.textField}>{ data.email }</Text>
@@ -80,7 +77,7 @@ export default function ProfileScreen({ navigation }) {
             onPress={() => {}}
           >
             <View style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
-              <AntDesign name="home" size={28} color="black" style={{ marginRight: 12 }} />
+              <AntDesign name="home" size={28} style={{ marginRight: 12 }} />
               <Text style={{ fontSize: 14 }}>Enter home location</Text>
             </View>
           </TouchableOpacity>
@@ -92,7 +89,7 @@ export default function ProfileScreen({ navigation }) {
             onPress={() => {}}
           >
             <View style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
-              <Ionicons name="briefcase-outline" size={28} color="black" style={{ marginRight: 12 }} />
+              <Ionicons name="briefcase-outline" size={28} style={{ marginRight: 12 }} />
               <Text style={{ fontSize: 14 }}>Enter work location</Text>
             </View>
           </TouchableOpacity>
