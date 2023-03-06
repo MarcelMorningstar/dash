@@ -1,5 +1,5 @@
 import React from 'react'
-import { Appearance, Text as DefaultText, TextInput as DefaultTextInput, View as DefaultView, SafeAreaView as DefaultSafeAreaView, TouchableHighlight as DefaultTouchableHighlight } from 'react-native'
+import { Appearance, Text as DefaultText, TextInput as DefaultTextInput, View as DefaultView, SafeAreaView as DefaultSafeAreaView, TouchableHighlight as DefaultTouchableHighlight, StatusBar as DefaultStatusBar } from 'react-native'
 import { AntDesign as DefaultAntDesing, MaterialIcons as DefaultMaterialIcons, MaterialCommunityIcons as DefaultMaterialCommunityIcons, Feather as DefaultFeather, FontAwesome5 as DefaultFontAwesome5, Ionicons as DefaultIonicons } from '@expo/vector-icons'
 import Colors from '../constants/Colors'
 
@@ -8,6 +8,13 @@ export function useThemeColor(colorName) {
   const color = Colors[theme][colorName];
 
   return color
+}
+
+export function StatusBar(props) {
+  const theme = Appearance.getColorScheme();
+  const { ...otherProps } = props;
+
+  return <DefaultStatusBar translucent backgroundColor="transparent" barStyle={ theme == 'light' ? 'dark-content' : 'light-content' } {...otherProps} />;
 }
 
 export function Text(props) {
