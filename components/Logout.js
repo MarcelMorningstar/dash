@@ -1,5 +1,6 @@
 import React from 'react'
-import { Modal, StyleSheet, Text, TouchableOpacity, View} from 'react-native'
+import { Modal, StyleSheet, TouchableOpacity, View} from 'react-native'
+import { Text, Div } from './Themed';
 
 import { signOut } from "firebase/auth";
 import { auth } from '../firebase'
@@ -20,7 +21,7 @@ export default function Logout({ visible, setVisible }) {
             visible={visible}
         >
             <View style={styles.centeredView}>
-                <View style={styles.modalView}>
+                <Div style={styles.modalView}>
                     <Text style={{ marginBottom: 2, textAlign: 'center', fontSize: 21, fontWeight: '500' }}>Log out</Text>
                     <Text style={{ marginVertical: 8, textAlign: 'center', fontSize: 14 }}>Are you sure want to log out?</Text>
 
@@ -38,7 +39,7 @@ export default function Logout({ visible, setVisible }) {
                             <Text style={{ color: 'black', fontWeight: '500' }}>Back</Text>
                         </TouchableOpacity>
                     </View>
-                </View>
+                </Div>
             </View>
         </Modal>
     )
@@ -52,9 +53,7 @@ const styles = StyleSheet.create({
     },
     modalView: {
         padding: 20,
-        backgroundColor: 'white',
         borderRadius: 21,
-        shadowColor: '#000',
         shadowOffset: { width: 0, height: 0 },
         shadowOpacity: 0.25,
         shadowRadius: 4,

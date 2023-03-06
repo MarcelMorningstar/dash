@@ -68,9 +68,9 @@ export function TextInput(props) {
 export function Div(props) {
   const { style, ...otherProps } = props;
   const color = useThemeColor('secondaryBackground')
-  const border = useThemeColor('shadow')
+  const shadow = useThemeColor('shadow')
 
-  return <DefaultView style={[{ backgroundColor: color, borderColor: border }, style]} {...otherProps} />;
+  return <DefaultView style={[{ backgroundColor: color, borderColor: shadow, shadowColor: shadow }, style]} {...otherProps} />;
 }
 
 export function Div2(props) {
