@@ -4,7 +4,7 @@ import * as SplashScreen from "expo-splash-screen";
 import * as Location from 'expo-location';
 import * as FileSystem from 'expo-file-system';
 
-import { NavigationContainer, DarkTheme, Theme } from '@react-navigation/native';
+import { NavigationContainer } from "../components/Themed";
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 
@@ -31,7 +31,7 @@ const theme = Appearance.getColorScheme()
 
 export default function Navigation() {
   return (
-    <NavigationContainer theme={theme === 'dark' ? DarkTheme : Theme}>
+    <NavigationContainer>
       <RootNavigator />
     </NavigationContainer>
   )

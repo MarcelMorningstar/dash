@@ -1,20 +1,52 @@
-import React from 'react'
+import React, { useState } from 'react'
+import * as Updates from 'expo-updates';
 import { Appearance, Text as DefaultText, TextInput as DefaultTextInput, View as DefaultView, SafeAreaView as DefaultSafeAreaView, TouchableHighlight as DefaultTouchableHighlight, StatusBar as DefaultStatusBar } from 'react-native'
+import { DarkTheme, DefaultTheme, NavigationContainer as DefaultNavigationContainer } from '@react-navigation/native'
 import { AntDesign as DefaultAntDesing, MaterialIcons as DefaultMaterialIcons, MaterialCommunityIcons as DefaultMaterialCommunityIcons, Feather as DefaultFeather, FontAwesome5 as DefaultFontAwesome5, Ionicons as DefaultIonicons } from '@expo/vector-icons'
 import Colors from '../constants/Colors'
 
 export function useThemeColor(colorName) {
-  const theme = Appearance.getColorScheme();
+  let theme = Appearance.getColorScheme();
   const color = Colors[theme][colorName];
+
+  Appearance.addChangeListener((T) => {
+    theme = T.colorScheme
+    Updates.reloadAsync()
+  })
 
   return color
 }
 
 export function StatusBar(props) {
-  const theme = Appearance.getColorScheme();
+  let theme = Appearance.getColorScheme();
+  const [Theme, setTheme] = useState(theme === 'light' ? 'dark-content' : 'light-content')
   const { ...otherProps } = props;
 
-  return <DefaultStatusBar translucent backgroundColor="transparent" barStyle={ theme == 'light' ? 'dark-content' : 'light-content' } {...otherProps} />;
+  Appearance.addChangeListener((T) => {
+    if (T.colorScheme == 'light') {
+      setTheme('dark-content')
+    } else {
+      setTheme('light-content')
+    }
+  })
+
+  return <DefaultStatusBar translucent backgroundColor="transparent" barStyle={Theme} {...otherProps} />;
+}
+
+export function NavigationContainer(props) {
+  let theme = Appearance.getColorScheme();
+  const [Theme, setTheme] = useState(theme === 'light' ? DefaultTheme : DarkTheme)
+  const { ...otherProps } = props;
+
+  Appearance.addChangeListener((T) => {
+    if (T.colorScheme == 'light') {
+      setTheme(DefaultTheme)
+    } else {
+      setTheme(DarkTheme)
+    }
+  })
+
+  return <DefaultNavigationContainer theme={Theme} {...otherProps} />;
 }
 
 export function Text(props) {
@@ -36,7 +68,7 @@ export function TextInput(props) {
 export function Div(props) {
   const { style, ...otherProps } = props;
   const color = useThemeColor('secondaryBackground')
-  const border = useThemeColor('tint')
+  const border = useThemeColor('shadow')
 
   return <DefaultView style={[{ backgroundColor: color, borderColor: border }, style]} {...otherProps} />;
 }
