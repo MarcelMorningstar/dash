@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { Image, Keyboard, KeyboardAvoidingView, Platform, StatusBar, StyleSheet, Text, TextInput, TouchableHighlight, TouchableOpacity, TouchableWithoutFeedback, View } from 'react-native'
 import PhoneInput from "react-native-phone-number-input";
+import { CodeField, Cursor, useBlurOnFulfill, useClearByFocusCell } from 'react-native-confirmation-code-field';
 
 import * as Cellular from 'expo-cellular';
 
@@ -10,10 +11,16 @@ import { app, auth } from '../firebase'
 
 export default function LoginScreen() {
   const recaptchaVerifier = useRef(null)
+
   const [countryCode, setCountryCode] = useState(null)
   const [phoneNumber, setPhoneNumber] = useState()
+
   const [verificationId, setVerificationId] = useState()
-  const [verificationCode, setVerificationCode] = useState()
+
+  const CELL_COUNT = 6;
+  const [value, setValue] = useState('');
+  const ref = useBlurOnFulfill({value, cellCount: CELL_COUNT});
+  const [props, getCellOnLayoutHandler] = useClearByFocusCell({ value, setValue, });
 
   const [message, showMessage] = useState()
 
@@ -35,11 +42,21 @@ export default function LoginScreen() {
               <Text style={{ textAlign: 'center', fontSize: 16 }}>Please enter Code sent to {phoneNumber}</Text>
 
               <View style={styles.verifyContainer}>
-                <TextInput
-                  editable={!!verificationId}
-                  placeholder="123456"
-                  onChangeText={setVerificationCode}
-                  style={styles.phoneNumberInput}
+                <CodeField
+                  ref={ref}
+                  {...props}
+                  value={value}
+                  onChangeText={setValue}
+                  cellCount={CELL_COUNT}
+                  keyboardType="number-pad"
+                  renderCell={({index, symbol, isFocused}) => (
+                    <Text
+                      key={index}
+                      style={[styles.cell, isFocused && styles.focusCell]}
+                      onLayout={getCellOnLayoutHandler(index)}>
+                      {symbol || (isFocused ? <Cursor style={{ marginTop: 16 }} /> : null)}
+                    </Text>
+                  )}
                 />
                 <TouchableHighlight 
                   activeOpacity={0.9}
@@ -48,7 +65,7 @@ export default function LoginScreen() {
                   disabled={!verificationId}
                   onPress={async () => {
                     try {
-                      const credential = PhoneAuthProvider.credential(verificationId, verificationCode);
+                      const credential = PhoneAuthProvider.credential(verificationId, value);
                       await signInWithCredential(auth, credential);
                       showMessage({ text: 'Phone authentication successful 👍' });
                     } catch (err) {
@@ -231,13 +248,6 @@ const styles = StyleSheet.create({
     height: 116,
     justifyContent: "space-between"
   },
-  phoneNumberInput: {
-    width: '100%',
-    height: 44,
-    paddingHorizontal: 12,
-    backgroundColor: '#E7E7E7',
-    borderRadius: 8
-  },
   btn: {
     width: '100%',
     height: 44,
@@ -271,5 +281,18 @@ const styles = StyleSheet.create({
     width: '100%',
     height: '100%',
     resizeMode: 'contain'
-  }
+  },
+  cell: {
+    width: 42,
+    height: 42,
+    lineHeight: 38,
+    fontSize: 24,
+    borderRadius: 12,
+    borderWidth: 2,
+    borderColor: '#00000030',
+    textAlign: 'center',
+  },
+  focusCell: {
+    borderColor: '#000',
+  },
 })
