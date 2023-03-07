@@ -1,5 +1,8 @@
-import React, { useRef, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { Image, Keyboard, KeyboardAvoidingView, Platform, StatusBar, StyleSheet, Text, TextInput, TouchableHighlight, TouchableOpacity, TouchableWithoutFeedback, View } from 'react-native'
+import PhoneInput from "react-native-phone-number-input";
+
+import * as Cellular from 'expo-cellular';
 
 import { FirebaseRecaptchaVerifierModal, FirebaseRecaptchaBanner } from 'expo-firebase-recaptcha';
 import { PhoneAuthProvider, signInWithCredential } from "firebase/auth"
@@ -7,11 +10,20 @@ import { app, auth } from '../firebase'
 
 export default function LoginScreen() {
   const recaptchaVerifier = useRef(null)
+  const [countryCode, setCountryCode] = useState(null)
   const [phoneNumber, setPhoneNumber] = useState()
   const [verificationId, setVerificationId] = useState()
   const [verificationCode, setVerificationCode] = useState()
 
   const [message, showMessage] = useState()
+
+  useEffect(() => {
+    (async () => {
+      const cellular = await Cellular.getIsoCountryCodeAsync();
+
+      setCountryCode(cellular.toUpperCase())
+    })()
+  }, [])
 
   if (!!verificationId) {
     return (
@@ -77,15 +89,25 @@ export default function LoginScreen() {
           
           <View style={{ flex: 6, width: '70%' }}>
             <View style={styles.phoneContainer}>
-              <TextInput 
-                placeholder="Phone"
-                autoCompleteType="tel"
-                keyboardType="phone-pad"
-                value={phoneNumber}
-                textContentType="telephoneNumber"
-                onChangeText={setPhoneNumber}
-                style={styles.phoneNumberInput}
-              />
+              {
+                !!countryCode && (
+                  <PhoneInput 
+                    defaultCode={countryCode}
+                    defaultValue={phoneNumber}
+                    onChangeFormattedText={(text) => {
+                      setPhoneNumber(text);
+                    }}
+                    containerStyle={{
+                      width: '100%',
+                      borderRadius: 8
+                    }}
+                    textContainerStyle={{
+                      backgroundColor: '#E7E7E7',
+                      borderRadius: 8
+                    }}
+                  />
+                )
+              }
               <TouchableHighlight 
                 activeOpacity={0.9}
                 underlayColor="#d39109"
@@ -206,7 +228,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between"
   },
   phoneContainer: {
-    height: 100,
+    height: 116,
     justifyContent: "space-between"
   },
   phoneNumberInput: {
