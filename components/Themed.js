@@ -1,17 +1,15 @@
 import React, { useState } from 'react'
-import * as Updates from 'expo-updates';
 import { Appearance, Text as DefaultText, TextInput as DefaultTextInput, View as DefaultView, SafeAreaView as DefaultSafeAreaView, TouchableHighlight as DefaultTouchableHighlight, StatusBar as DefaultStatusBar } from 'react-native'
 import { DarkTheme, DefaultTheme, NavigationContainer as DefaultNavigationContainer } from '@react-navigation/native'
 import { AntDesign as DefaultAntDesing, MaterialIcons as DefaultMaterialIcons, MaterialCommunityIcons as DefaultMaterialCommunityIcons, Feather as DefaultFeather, FontAwesome5 as DefaultFontAwesome5, Ionicons as DefaultIonicons } from '@expo/vector-icons'
 import Colors from '../constants/Colors'
 
 export function useThemeColor(colorName) {
-  let theme = Appearance.getColorScheme();
+  const [theme, setTheme] = useState(Appearance.getColorScheme());
   const color = Colors[theme][colorName];
 
   Appearance.addChangeListener((T) => {
-    theme = T.colorScheme
-    Updates.reloadAsync()
+    setTheme(T.colorScheme)
   })
 
   return color

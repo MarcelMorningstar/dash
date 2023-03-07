@@ -1,11 +1,15 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { StyleSheet, Appearance } from 'react-native'
 import MapView, { PROVIDER_GOOGLE } from 'react-native-maps'
 
 import MapColor from '../constants/Map'
 
 export default function Map({ children, mapRef, origin, directionsView, destinationMenu, userLocationChange, insets }) {
-  const theme = Appearance.getColorScheme();
+  const [theme, setTheme] = useState(Appearance.getColorScheme());
+
+  Appearance.addChangeListener((T) => {
+    setTheme(T.colorScheme)
+  })
 
   return (
     <MapView
