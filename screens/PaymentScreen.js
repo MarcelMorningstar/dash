@@ -1,13 +1,20 @@
 import React, { useState } from 'react'
-import { StyleSheet, TouchableOpacity, View } from 'react-native'
+import { Appearance, StyleSheet, TouchableOpacity, View } from 'react-native'
 import { PrimaryView, Feather, FontAwesome5, MaterialIcons, Text } from '../components/Themed'
 
+import Colors from '../constants/Colors'
+
 import Layout from '../components/Layout'
-import SectionLine from '../components/SectionLine'
-import ButtonLine from '../components/ButtonLine'
+import Divider from '../components/Divider'
 
 export default function PaymentScreen({ navigation }) {
   const [method, setMethod] = useState('card')
+
+  const [theme, setTheme] = useState(Appearance.getColorScheme())
+
+  Appearance.addChangeListener((T) => {
+    setTheme(T.colorScheme)
+  })
 
   return (
     <Layout title='Payment' navigation={navigation} backScreen='Home'>
@@ -26,7 +33,7 @@ export default function PaymentScreen({ navigation }) {
               </View>
             </TouchableOpacity>
 
-            <ButtonLine />
+            <Divider height={1.4} color={Colors[theme]['secondaryBackground']} borderRadius={4} />
 
             <TouchableOpacity style={styles.btn} onPress={() => {}}>
               <View style={[styles.row, { alignItems: 'center' }]}>
@@ -37,7 +44,7 @@ export default function PaymentScreen({ navigation }) {
           </View>
         </View>
 
-        <SectionLine />
+        <Divider height={5} color={Colors[theme]['secondaryBackground']} />
         
         <View style={[styles.column, styles.view]}>
           <Text style={{ marginVertical: 5, fontSize: 16, fontWeight: '500' }}>Payment Method</Text>
@@ -55,7 +62,7 @@ export default function PaymentScreen({ navigation }) {
               </View>
             </TouchableOpacity>
 
-            <ButtonLine />
+            <Divider height={1.4} color={Colors[theme]['secondaryBackground']} borderRadius={4} />
 
             <TouchableOpacity style={styles.btn} onPress={() => setMethod('balance')}>
               <View style={[styles.row, { justifyContent: 'space-between', alignItems: 'center' }]}>
@@ -69,7 +76,7 @@ export default function PaymentScreen({ navigation }) {
               </View>
             </TouchableOpacity>
 
-            <ButtonLine />
+            <Divider height={1.4} color={Colors[theme]['secondaryBackground']} borderRadius={4} />
 
             <TouchableOpacity style={styles.btn} onPress={() => setMethod('cash')}>
               <View style={[styles.row, { justifyContent: 'space-between', alignItems: 'center' }]}>

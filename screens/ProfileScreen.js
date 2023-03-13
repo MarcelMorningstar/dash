@@ -1,11 +1,12 @@
 import React, { useState } from 'react'
-import { Image, StyleSheet, TouchableOpacity, View } from 'react-native'
+import { Appearance, Image, StyleSheet, TouchableOpacity, View } from 'react-native'
 import { AntDesign, Feather, FontAwesome5, Ionicons, MaterialCommunityIcons, MaterialIcons, Text, TouchableHighlight } from '../components/Themed'
+
+import Colors from '../constants/Colors'
 
 import Layout from '../components/Layout'
 import Logout from '../components/Logout'
-import SectionLine from '../components/SectionLine'
-import ButtonLine from '../components/ButtonLine'
+import Divider from '../components/Divider'
 
 import { useSelector } from 'react-redux'
 import { selectUserInfo } from '../slices/authSlice'
@@ -13,6 +14,12 @@ import { selectUserInfo } from '../slices/authSlice'
 export default function ProfileScreen({ navigation }) {
   const data = useSelector(selectUserInfo);
   const [logout, setLogout] = useState(false);
+
+  const [theme, setTheme] = useState(Appearance.getColorScheme())
+
+  Appearance.addChangeListener((T) => {
+    setTheme(T.colorScheme)
+  })
 
   return (
     <Layout title='Profile' navigation={navigation} backScreen='Home'>
@@ -68,7 +75,7 @@ export default function ProfileScreen({ navigation }) {
           }
         </View>
 
-        <SectionLine />
+        <Divider height={5} color={Colors[theme]['secondaryBackground']} />
 
         <View style={styles.fieldContainer}>
           <Text style={{ marginBottom: 8, fontSize: 15, fontWeight: '500' }}>My locations</Text>
@@ -82,7 +89,7 @@ export default function ProfileScreen({ navigation }) {
             </View>
           </TouchableOpacity>
 
-          <ButtonLine />
+          <Divider height={1.4} color={Colors[theme]['secondaryBackground']} borderRadius={4} />
 
           <TouchableOpacity
             style={styles.btn}
@@ -95,7 +102,7 @@ export default function ProfileScreen({ navigation }) {
           </TouchableOpacity>
         </View>
 
-        <SectionLine />
+        <Divider height={5} color={Colors[theme]['secondaryBackground']} />
         
         <View style={styles.fieldContainer}>
           <TouchableOpacity
