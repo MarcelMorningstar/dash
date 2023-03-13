@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { Appearance, PixelRatio, Platform, StyleSheet, Text, View } from 'react-native'
-import { TouchableHighlight } from '../components/Themed'
+import { TouchableHighlight, MaterialCommunityIcons } from '../components/Themed'
 import * as BackgroundFetch from 'expo-background-fetch'
 import * as TaskManager from 'expo-task-manager'
 import * as Location from 'expo-location'
@@ -12,6 +12,7 @@ import MapViewDirections from 'react-native-maps-directions'
 import Map from '../components/Map'
 import DriverMarker from '../components/DriverMarker'
 import SlideInMenu from '../components/order/SlideInMenu'
+import Type from '../components/order/Type'
 import DestinationChoice from '../components/order/DestinationChoice'
 import DestinationAcceptance from '../components/order/DestinationAcceptance'
 import ProcessingOrder from '../components/order/ProcessingOrder'
@@ -21,7 +22,7 @@ import Colors from '../constants/Colors'
 import { useSelector, useDispatch } from 'react-redux'
 import { selectDestination, selectOrigin, setDestination, setOrigin } from '../slices/mainSlice'
 import { selectUserInfo, selectUserToken } from '../slices/authSlice'
-import { selectOrderInformation, selectOrderToken, setOrderInformation, setOrderToken } from '../slices/orderSlice'
+import { selectOrderInformation, selectOrderToken, selectOrderType, setOrderInformation, setOrderToken } from '../slices/orderSlice'
 
 import { collection, query, where, onSnapshot, doc, updateDoc } from "firebase/firestore";
 import { ref, set } from "firebase/database"
@@ -32,38 +33,43 @@ import { GOOGLE_API_KEY } from '@env'
 const BACKGROUND_FETCH_TASK = 'background-location-task';
 
 export default function HomeScreen() {
-  const theme = Appearance.getColorScheme();
+  const theme = Appearance.getColorScheme()
   const insets = useSafeAreaInsets()
+
   const mapRef = useRef(null)
   const childRef = useRef(null)
-  const [directionsView, setDirectionsView] = useState(false)
-  const [destinationMenu, setDestinationMenu] = useState(false)
-  const [drivers, setDrivers] = useState([])
-  const [status, setStatus] = useState('')
+
+  let userLoactionUpdateInterval = useRef()
+
   const dispatch = useDispatch()
   const origin = useSelector(selectOrigin)
   const destination = useSelector(selectDestination)
   const userToken = useSelector(selectUserToken)
   const userInfo = useSelector(selectUserInfo)
   const orderToken = useSelector(selectOrderToken)
+  const orderType = useSelector(selectOrderType)
   const orderInformation = useSelector(selectOrderInformation)
-  let userLoactionUpdateInterval = useRef()
+
+  const [typeMenu, setTypeMenu] = useState(false)
+  const [directionsView, setDirectionsView] = useState(false)
+  const [destinationMenu, setDestinationMenu] = useState(false)
+  const [drivers, setDrivers] = useState([])
+  const [status, setStatus] = useState('')
 
   const styles = StyleSheet.create({
     inputContainer: {
       position: 'absolute',
-      left: 0,
-      right: 0,
       bottom: 32,
-      alignItems: 'center',
+      display: 'flex',
+      flexDirection: 'row', 
+      alignSelf: 'center',
+      width: '75%',
     },
     inputField: {
       justifyContent: 'center',
-      width: '80%',
       height: 50,
-      paddingHorizontal: 12,
       backgroundColor: "#FFF",
-      borderRadius: 16,
+      borderRadius: 12,
       elevation: 4,
       shadowOffset: { width: 0, height: 1 },
       shadowOpacity: 0.25
@@ -114,12 +120,11 @@ export default function HomeScreen() {
       registerBackgroundFetchAsync() 
 
       updateUserLocation()
-
       userLoactionUpdateInterval.current = setInterval(() => {
         updateUserLocation()
       }, 5000)
 
-      const orderUnsubscribe = onSnapshot(doc(firestore, "calls", orderToken), (snapshot) => {
+      const orderUpdates = onSnapshot(doc(firestore, "calls", orderToken), (snapshot) => {
         let data = snapshot.data()
 
         console.log(data)
@@ -152,15 +157,15 @@ export default function HomeScreen() {
   }
 
   const cancelOrder = async (orderToken) => {
+    dispatch(setDestination(null))
+    dispatch(setOrderToken(null))
+    dispatch(setOrderInformation(null))
+
     const callRef = doc(firestore, "calls", orderToken);
 
     await updateDoc(callRef, {
       status: 'canceled'
     });
-
-    dispatch(setDestination(null))
-    dispatch(setOrderToken(null))
-    dispatch(setOrderInformation(null))
   }
 
   TaskManager.defineTask(BACKGROUND_FETCH_TASK, () => {
@@ -310,10 +315,24 @@ export default function HomeScreen() {
       {
         !directionsView && (
           <View style={styles.inputContainer}>
+            <TouchableHighlight
+              activeOpacity={0.6}
+              underlayColor="#DDDDDD"
+              style={[styles.inputField, { alignItems: 'center', width: 50, paddingHorizontal: 4, marginRight: 12 }]}
+              onPress={() => setTypeMenu(true)}
+            >
+              <MaterialCommunityIcons name="format-list-bulleted-type" size={32} color='black' />
+            </TouchableHighlight>
+
+            <Type 
+              visible={typeMenu}
+              setVisible={setTypeMenu}
+            />
+            
             <TouchableHighlight 
               activeOpacity={0.6}
               underlayColor="#DDDDDD"
-              style={styles.inputField} 
+              style={[{ flex: 1, paddingHorizontal: 12 }, styles.inputField]} 
               onPress={() => setDestinationMenu(true)}
             >
               <Text style={{ fontSize: 18, color: 'rgba(0, 0, 0, .4)' }}>Destination</Text>
@@ -342,6 +361,10 @@ export default function HomeScreen() {
             />
           ) : destination ? (
             <DestinationAcceptance 
+              userToken={userToken}
+              origin={origin}
+              destination={destination}
+              orderType={orderType}
               setStatus={setStatus}
               setDirectionsView={setDirectionsView}
               fitUser={fitUser}

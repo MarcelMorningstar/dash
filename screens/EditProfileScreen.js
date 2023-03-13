@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
-import { Image, ScrollView, StyleSheet, Text, TouchableHighlight, TouchableWithoutFeedback, View } from 'react-native'
-import { Div2, TextInput, TouchableHighlight2 } from '../components/Themed'
+import { Image, ScrollView, StyleSheet, Text, TouchableWithoutFeedback, View } from 'react-native'
+import { PrimaryView, TextInput, PrimaryTouchableHighlight } from '../components/Themed'
 import { FontAwesome5, MaterialIcons } from '@expo/vector-icons'
 import Layout from '../components/Layout'
 
@@ -114,9 +114,9 @@ export default function EditProfileScreen({ navigation }) {
       <ScrollView contentContainerStyle={styles.container}>
         <TouchableWithoutFeedback onPress={pickImage}>
           <View style={styles.picContainer}>
-            <Div2 style={{ position: 'absolute', zIndex: 10, top: 0, right: 0, padding: 4, borderRadius: 20 }}>
+            <PrimaryView style={{ position: 'absolute', zIndex: 10, top: 0, right: 0, padding: 4, borderRadius: 20 }}>
               <MaterialIcons name="edit" size={21} color='white' />
-            </Div2>
+            </PrimaryView>
             {
               userInfo.image || pickedImage ?
                 <Image
@@ -158,13 +158,13 @@ export default function EditProfileScreen({ navigation }) {
           />
         </View>
 
-        <TouchableHighlight2
+        <PrimaryTouchableHighlight
           activeOpacity={0.6}
           style={styles.saveBtn}
           onPress={updateUserData}
         >
           <Text style={{ color: 'white', fontSize: 24, fontWeight: '500' }}>Save</Text>
-        </TouchableHighlight2>
+        </PrimaryTouchableHighlight>
       </ScrollView>
     </Layout>
   )

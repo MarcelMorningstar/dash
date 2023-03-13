@@ -5,6 +5,7 @@ export default {
     placeholderText: '#717171',
     background: '#F5F5F5',
     secondaryBackground: '#DDDDDD',
+    tertiaryBackground: '#B0B0B0',
     tint: '#D07E09',
     shadow: '#000'
   },
@@ -14,6 +15,7 @@ export default {
     placeholderText: '#C0C0C0',
     background: '#212121',
     secondaryBackground: '#646464',
+    tertiaryBackground: '#494949',
     tint: '#D39109',
     shadow: '#F5F5F5'
   },

@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Appearance, Text as DefaultText, TextInput as DefaultTextInput, View as DefaultView, SafeAreaView as DefaultSafeAreaView, TouchableHighlight as DefaultTouchableHighlight, StatusBar as DefaultStatusBar } from 'react-native'
+import { Appearance, Text as DefaultText, TextInput as DefaultTextInput, View as DefaultView, SafeAreaView as DefaultSafeAreaView, TouchableHighlight as DefaultTouchableHighlight, TouchableOpacity as DefaultTouchableOpacity, StatusBar as DefaultStatusBar } from 'react-native'
 import { DarkTheme, DefaultTheme, NavigationContainer as DefaultNavigationContainer } from '@react-navigation/native'
 import { AntDesign as DefaultAntDesing, MaterialIcons as DefaultMaterialIcons, MaterialCommunityIcons as DefaultMaterialCommunityIcons, Feather as DefaultFeather, FontAwesome5 as DefaultFontAwesome5, Ionicons as DefaultIonicons } from '@expo/vector-icons'
 import Colors from '../constants/Colors'
@@ -28,7 +28,7 @@ export function StatusBar(props) {
     }
   })
 
-  return <DefaultStatusBar translucent backgroundColor="transparent" barStyle={Theme} {...otherProps} />;
+  return <DefaultStatusBar barStyle={Theme} translucent backgroundColor="transparent" {...otherProps} />;
 }
 
 export function NavigationContainer(props) {
@@ -63,7 +63,7 @@ export function TextInput(props) {
   return <DefaultTextInput style={[{ color: color, backgroundColor: backgroundColor } , style]} placeholderTextColor={placeholderColor} {...otherProps} />;
 }
 
-export function Div(props) {
+export function SecondaryView(props) {
   const { style, ...otherProps } = props;
   const color = useThemeColor('secondaryBackground')
   const shadow = useThemeColor('shadow')
@@ -71,11 +71,19 @@ export function Div(props) {
   return <DefaultView style={[{ backgroundColor: color, borderColor: shadow, shadowColor: shadow }, style]} {...otherProps} />;
 }
 
-export function Div2(props) {
+export function PrimaryView(props) {
   const { style, ...otherProps } = props;
   const color = useThemeColor('primary')
 
   return <DefaultView style={[{ backgroundColor: color, borderColor: color }, style]} {...otherProps} />;
+}
+
+export function View(props) {
+  const { style, ...otherProps } = props;
+  const color = useThemeColor('background')
+  const shadow = useThemeColor('shadow')
+
+  return <DefaultSafeAreaView style={[{ backgroundColor: color, shadowColor: shadow }, style]} {...otherProps} />;
 }
 
 export function SafeAreaView(props) {
@@ -93,13 +101,21 @@ export function TouchableHighlight(props) {
   return <DefaultTouchableHighlight underlayColor={ underlayColor } style={[{ shadowColor: shadowColor }, style]} {...otherProps} />;
 }
 
-export function TouchableHighlight2(props) {
+export function PrimaryTouchableHighlight(props) {
   const { style, ...otherProps } = props;
   const color = useThemeColor('primary')
   const underlayColor = useThemeColor('tint')
   const shadowColor = useThemeColor('shadow')
 
   return <DefaultTouchableHighlight underlayColor={ underlayColor } style={[{ backgroundColor: color, shadowColor: shadowColor }, style]} {...otherProps} />;
+}
+
+export function SecondaryTouchableOpacity(props) {
+  const { style, ...otherProps } = props;
+  const color = useThemeColor('secondaryBackground')
+  const shadowColor = useThemeColor('shadow')
+
+  return <DefaultTouchableOpacity style={[{ backgroundColor: color, shadowColor: shadowColor }, style]} {...otherProps} />;
 }
 
 export function AntDesign(props) {

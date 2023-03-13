@@ -1,10 +1,9 @@
 import React, { useEffect, useState } from 'react'
 import { StyleSheet, TouchableHighlight, View } from 'react-native'
-import { Text, TouchableHighlight2 } from '../Themed'
+import { Text, PrimaryTouchableHighlight } from '../Themed'
 
-import { useDispatch, useSelector } from 'react-redux'
-import { selectDestination, selectOrigin, selectTravelInformation, setDestination, setTravelInformation } from '../../slices/mainSlice'
-import { selectUserToken } from '../../slices/authSlice';
+import { useDispatch } from 'react-redux'
+import { setDestination } from '../../slices/mainSlice'
 import { setOrderToken, setOrderInformation } from '../../slices/orderSlice';
 
 import { collection, addDoc } from "firebase/firestore";
@@ -12,12 +11,9 @@ import { firestore } from '../../firebase'
 
 import { GOOGLE_API_KEY } from '@env'
 
-export default function DestinationAcceptance({ setStatus, setDirectionsView, fitUser }) {
+export default function DestinationAcceptance({ userToken, origin, destination, orderType, setStatus, setDirectionsView, fitUser }) {
   const dispatch = useDispatch()
-  const userToken = useSelector(selectUserToken)
-  const origin = useSelector(selectOrigin)
-  const destination = useSelector(selectDestination)
-  const travelInformation = useSelector(selectTravelInformation)
+  const [travelInformation, setTravelInformation] = useState(null)
   const [from, setFrom] = useState('')
 
   useEffect(() => {
@@ -25,7 +21,7 @@ export default function DestinationAcceptance({ setStatus, setDirectionsView, fi
       fetch(`https://maps.googleapis.com/maps/api/distancematrix/json?origins=${origin.latitude},${origin.longitude}&destinations=${destination.latitude},${destination.longitude}&units=metric&key=${GOOGLE_API_KEY}`)
       .then(response => response.json())
       .then(data => {
-        dispatch(setTravelInformation(data.rows[0].elements[0]))
+        setTravelInformation(data.rows[0].elements[0])
       })
     }
 
@@ -48,7 +44,7 @@ export default function DestinationAcceptance({ setStatus, setDirectionsView, fi
   const getDuration = (duration) => {
     let hours = 0;
     let minutes = (Math.floor(duration / 60)).toString().padStart(2, '0')
-    let seconds = duration - minutes * 60
+    let seconds = (duration - minutes * 60).toString().padStart(2, '0')
 
     if (minutes >= 60) {
       hours = (Math.floor(minutes / 60)).toString().padStart(2, '0')
@@ -63,18 +59,19 @@ export default function DestinationAcceptance({ setStatus, setDirectionsView, fi
   const createCall = async () => {
     const docRef = await addDoc(collection(firestore, "calls"), {
       created_at: new Date(),
+      type: orderType,
       status: 'in wait',
-      user: {
-        id: userToken,
+      pick_up: {
         latitude: origin.latitude,
         longitude: origin.longitude,
         address: from
       },
       destination: destination,
       travelInformation: {
-        distance: getDistance(travelInformation?.distance.value),
-        duration: getDuration(travelInformation?.duration.value)
-      }
+        distance: getDistance(travelInformation.distance.value),
+        duration: getDuration(travelInformation.duration.value)
+      },
+      user: userToken,
     });
 
     console.log(docRef.id)
@@ -82,16 +79,16 @@ export default function DestinationAcceptance({ setStatus, setDirectionsView, fi
     dispatch(setOrderToken(docRef.id))
     dispatch(setOrderInformation({
       status: 'in wait',
-      user: {
-        id: userToken,
+      pick_up: {
         latitude: origin.latitude,
-        longitude: origin.longitude
+        longitude: origin.longitude,
+        address: from
       },
       destination: destination,
       travelInformation: {
-        distance: getDistance(travelInformation?.distance.value),
-        duration: getDuration(travelInformation?.duration.value)
-      }
+        distance: getDistance(travelInformation.distance.value),
+        duration: getDuration(travelInformation.duration.value)
+      },
     }))
 
     setStatus('in wait')
@@ -108,7 +105,7 @@ export default function DestinationAcceptance({ setStatus, setDirectionsView, fi
         </Text>
       </View>
       <View style={styles.buttonContainer}>
-        <TouchableHighlight2
+        <PrimaryTouchableHighlight
           activeOpacity={0.8}
           style={[styles.button, { marginRight: 4 }]}
           onPress={() => { 
@@ -116,7 +113,7 @@ export default function DestinationAcceptance({ setStatus, setDirectionsView, fi
           }}
         >
           <Text style={{ color: 'white', fontWeight: '500' }}>Accept</Text>
-        </TouchableHighlight2>
+        </PrimaryTouchableHighlight>
         <TouchableHighlight
           activeOpacity={0.8}
           underlayColor="#6A6A6A"

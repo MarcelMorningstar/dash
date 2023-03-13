@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { StyleSheet, TouchableOpacity, View } from 'react-native'
-import { Div2, Feather, FontAwesome5, MaterialIcons, Text } from '../components/Themed'
+import { PrimaryView, Feather, FontAwesome5, MaterialIcons, Text } from '../components/Themed'
 
 import Layout from '../components/Layout'
 import SectionLine from '../components/SectionLine'
@@ -50,7 +50,7 @@ export default function PaymentScreen({ navigation }) {
                   <Text style={{ fontSize: 14 }}>Bank Card</Text>
                 </View>
                 {
-                  method == 'card' && <Div2 style={styles.circle} />
+                  method == 'card' && <PrimaryView style={styles.circle} />
                 }
               </View>
             </TouchableOpacity>
@@ -64,7 +64,7 @@ export default function PaymentScreen({ navigation }) {
                   <Text style={{ fontSize: 14 }}>App Balance</Text>
                 </View>
                 {
-                  method == 'balance' && <Div2 style={styles.circle} />
+                  method == 'balance' && <PrimaryView style={styles.circle} />
                 }
               </View>
             </TouchableOpacity>
@@ -78,7 +78,7 @@ export default function PaymentScreen({ navigation }) {
                   <Text style={{ fontSize: 14 }}>Cash</Text>
                 </View>
                 {
-                  method == 'cash' && <Div2 style={styles.circle} />
+                  method == 'cash' && <PrimaryView style={styles.circle} />
                 }
               </View>
             </TouchableOpacity>
