@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { Appearance, Text as DefaultText, TextInput as DefaultTextInput, View as DefaultView, SafeAreaView as DefaultSafeAreaView, TouchableHighlight as DefaultTouchableHighlight, TouchableOpacity as DefaultTouchableOpacity, StatusBar as DefaultStatusBar } from 'react-native'
 import { DarkTheme, DefaultTheme, NavigationContainer as DefaultNavigationContainer } from '@react-navigation/native'
+import { Divider as DefaultDivider } from './Divider'
 import { AntDesign as DefaultAntDesing, MaterialIcons as DefaultMaterialIcons, MaterialCommunityIcons as DefaultMaterialCommunityIcons, Feather as DefaultFeather, FontAwesome5 as DefaultFontAwesome5, Ionicons as DefaultIonicons } from '@expo/vector-icons'
 import Colors from '../constants/Colors'
 
@@ -116,6 +117,13 @@ export function SecondaryTouchableOpacity(props) {
   const shadowColor = useThemeColor('shadow')
 
   return <DefaultTouchableOpacity style={[{ backgroundColor: color, shadowColor: shadowColor }, style]} {...otherProps} />;
+}
+
+export function Divider(props) {
+  const { ...otherProps } = props;
+  const color = useThemeColor('secondaryBackground')
+
+  return <DefaultDivider color={color} {...otherProps} />;
 }
 
 export function AntDesign(props) {

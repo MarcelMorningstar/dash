@@ -1,7 +1,7 @@
 import React from 'react'
 import { View } from 'react-native'
 
-export default function Divider({ inset='center', width='100%', height=1, color='black', borderRadius=0 }) {
+export function Divider({ inset='center', width='100%', height=1, color='black', borderRadius=0 }) {
     return (
         <View 
             style={{ 
