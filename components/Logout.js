@@ -11,7 +11,7 @@ export default function Logout({ visible, setVisible }) {
         signOut(auth).then(() => {
           
         }).catch((error) => {
-            console.log(error)
+            
         });
     }
 

@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react'
-import { Appearance, PixelRatio, Platform, StyleSheet, Text, View } from 'react-native'
-import { TouchableHighlight, MaterialCommunityIcons } from '../components/Themed'
+import { Appearance, PixelRatio, Platform, StyleSheet, View } from 'react-native'
+import { TouchableHighlight } from '../components/Themed'
 import * as BackgroundFetch from 'expo-background-fetch'
 import * as TaskManager from 'expo-task-manager'
 import * as Location from 'expo-location'
@@ -11,6 +11,7 @@ import MapViewDirections from 'react-native-maps-directions'
 
 import Map from '../components/Map'
 import DriverMarker from '../components/DriverMarker'
+import ButtomSheet from '../components/ButtomSheet'
 import SlideInMenu from '../components/order/SlideInMenu'
 import Type from '../components/order/Type'
 import DestinationChoice from '../components/order/DestinationChoice'
@@ -236,7 +237,7 @@ export default function HomeScreen() {
           top: Platform.OS === 'android' ? PixelRatio.getPixelSizeForLayoutSize(insets.top + 90) : 50,
           right: Platform.OS === 'android' ? PixelRatio.getPixelSizeForLayoutSize(0) : 50,
           left: Platform.OS === 'android' ? PixelRatio.getPixelSizeForLayoutSize(0) : 50,
-          bottom: Platform.OS === 'android' ? PixelRatio.getPixelSizeForLayoutSize(destinationMenu ? 330 : 0) : destinationMenu ? 400 : 70
+          bottom: Platform.OS === 'android' ? PixelRatio.getPixelSizeForLayoutSize(12) : 70
         }
       })
     }, delay)
@@ -264,7 +265,7 @@ export default function HomeScreen() {
         )
       }
       
-      <Map mapRef={mapRef} origin={origin} directionsView={directionsView} destinationMenu={destinationMenu} userLocationChange={userLocationChange} insets={insets}>
+      <Map mapRef={mapRef} origin={origin} directionsView={directionsView} userLocationChange={userLocationChange} insets={insets}>
         {
           !directionsView && (
             drivers.map(driver => {
@@ -312,71 +313,20 @@ export default function HomeScreen() {
         }
       </Map>
 
-      {
-        !directionsView && (
-          <View style={styles.inputContainer}>
-            <TouchableHighlight
-              activeOpacity={0.6}
-              underlayColor="#DDDDDD"
-              style={[styles.inputField, { alignItems: 'center', width: 50, paddingHorizontal: 4, marginRight: 12 }]}
-              onPress={() => setTypeMenu(true)}
-            >
-              <MaterialCommunityIcons name="format-list-bulleted-type" size={32} color='black' />
-            </TouchableHighlight>
-
-            <Type 
-              visible={typeMenu}
-              setVisible={setTypeMenu}
-            />
-            
-            <TouchableHighlight 
-              activeOpacity={0.6}
-              underlayColor="#DDDDDD"
-              style={[{ flex: 1, paddingHorizontal: 12 }, styles.inputField]} 
-              onPress={() => setDestinationMenu(true)}
-            >
-              <Text style={{ fontSize: 18, color: 'rgba(0, 0, 0, .4)' }}>Destination</Text>
-            </TouchableHighlight>
-          </View>
-        )
-      }
-
-      <SlideInMenu 
-        ref={childRef}
-        title='Your ride' 
-        size={330} 
-        open={destinationMenu} 
-        setOpen={setDestinationMenu}
+      <ButtomSheet
+        userToken={userToken}
+        origin={origin}
+        destination={destination}
+        orderToken={orderToken}
+        orderType={orderType}
+        orderInformation={orderInformation}
+        setStatus={setStatus}
+        cancelOrder={cancelOrder}
+        directionsView={directionsView}
         setDirectionsView={setDirectionsView}
+        fitDerection={fitDerection}
         fitUser={fitUser}
-      >
-        {
-          status == 'in wait' ? (
-            <ProcessingOrder 
-              orderToken={orderToken}
-              orderInformation={orderInformation}
-              cancelOrder={cancelOrder}
-              setDirectionsView={setDirectionsView}
-              colseSlideIn={() => { childRef.current.close() }}
-            />
-          ) : destination ? (
-            <DestinationAcceptance 
-              userToken={userToken}
-              origin={origin}
-              destination={destination}
-              orderType={orderType}
-              setStatus={setStatus}
-              setDirectionsView={setDirectionsView}
-              fitUser={fitUser}
-            />
-          ) : (
-            <DestinationChoice 
-              setDirectionsView={setDirectionsView}
-              fitDerection={fitDerection}
-            />
-          )
-        }
-      </SlideInMenu>
+      />
     </View>
   )
 }

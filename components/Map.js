@@ -1,10 +1,10 @@
 import React, { useState } from 'react'
-import { StyleSheet, Appearance } from 'react-native'
+import { StyleSheet, Appearance, useColorScheme } from 'react-native'
 import MapView, { PROVIDER_GOOGLE } from 'react-native-maps'
 
 import MapColor from '../constants/Map'
 
-export default function Map({ children, mapRef, origin, directionsView, destinationMenu, userLocationChange, insets }) {
+export default function Map({ children, mapRef, origin, directionsView, userLocationChange, insets }) {
   const [theme, setTheme] = useState(Appearance.getColorScheme());
 
   Appearance.addChangeListener((T) => {
@@ -29,7 +29,7 @@ export default function Map({ children, mapRef, origin, directionsView, destinat
       mapType='mutedStandard'
       mapPadding={{
         top: insets.top,
-        bottom: destinationMenu ? 330 : 0,
+        bottom: 12
       }}
       customMapStyle={MapColor[theme]}
       style={styles.map}

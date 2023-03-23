@@ -71,7 +71,7 @@ export default function EditProfileScreen({ navigation }) {
     
           navigation.navigate('Profile')
         }).catch((error) => {
-          console.log(error)
+          
         });
       });
     } else {
@@ -90,7 +90,7 @@ export default function EditProfileScreen({ navigation }) {
   
         navigation.navigate('Profile')
       }).catch((error) => {
-        console.log(error)
+        
       });
     }
   }
