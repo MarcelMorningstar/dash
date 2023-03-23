@@ -12,11 +12,6 @@ import MapViewDirections from 'react-native-maps-directions'
 import Map from '../components/Map'
 import DriverMarker from '../components/DriverMarker'
 import ButtomSheet from '../components/ButtomSheet'
-import SlideInMenu from '../components/order/SlideInMenu'
-import Type from '../components/order/Type'
-import DestinationChoice from '../components/order/DestinationChoice'
-import DestinationAcceptance from '../components/order/DestinationAcceptance'
-import ProcessingOrder from '../components/order/ProcessingOrder'
 
 import Colors from '../constants/Colors'
 
