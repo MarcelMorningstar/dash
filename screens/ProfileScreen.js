@@ -9,7 +9,7 @@ import { useSelector } from 'react-redux'
 import { selectUserInfo } from '../slices/authSlice'
 
 export default function ProfileScreen({ navigation }) {
-  const data = useSelector(selectUserInfo);
+  const userInfo = useSelector(selectUserInfo);
   const [logout, setLogout] = useState(false);
 
   return (
@@ -25,10 +25,10 @@ export default function ProfileScreen({ navigation }) {
 
         <View style={styles.picContainer}>
           {
-            !!data.image ?
+            !!userInfo.image ?
               <Image
                 source={{
-                  uri: data.thumbnail,
+                  uri: userInfo.thumbnail,
                 }}
                 style={{
                   width: '100%',
@@ -42,7 +42,8 @@ export default function ProfileScreen({ navigation }) {
           }
         </View>
 
-        <Text style={styles.name}>{ data.name }</Text>
+        <Text style={{ marginTop: 5, fontSize: 24, fontWeight: '500' }}>{ userInfo.displayName }</Text>
+        <Text style={{ fontSize: 16 }}>{ `${userInfo.firstName} ${userInfo.lastName}` }</Text>
 
         <View style={styles.fieldContainer}>
           <View style={styles.field}>
@@ -51,17 +52,17 @@ export default function ProfileScreen({ navigation }) {
               size={30} 
               style={{ marginRight: 12 }} 
             />
-            <Text style={styles.textField}>{ data.phone }</Text>
+            <Text style={styles.textField}>{ userInfo.phoneNumber }</Text>
           </View>
           {
-            !!data.email && 
+            !!userInfo.email && 
             <View style={styles.field}>
               <MaterialCommunityIcons 
                 name="email-outline" 
                 size={30} 
                 style={{ marginRight: 12 }} 
               />
-              <Text style={styles.textField}>{ data.email }</Text>
+              <Text style={styles.textField}>{ userInfo.email }</Text>
             </View>
           }
         </View>
@@ -127,11 +128,6 @@ const styles = StyleSheet.create({
     height: 96,
     backgroundColor: '#DDDDDD',
     borderRadius: 48
-  },
-  name: {
-    marginVertical: 5,
-    fontSize: 24,
-    fontWeight: '600'
   },
   fieldContainer: {
     width: '85%',

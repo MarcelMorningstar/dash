@@ -18,12 +18,14 @@ export default function EditProfileScreen({ navigation }) {
   const dispatch = useDispatch()
   const userInfo = useSelector(selectUserInfo)
   const userToken = useSelector(selectUserToken)
+  const [displayName, setDisplayName] = useState('')
   const [firstName, setFirstName] = useState('')
   const [lastName, setLastName] = useState('')
   const [email, setEmail] = useState('')
   const [pickedImage, setPickedImage] = useState(null)
 
   useEffect(() => {
+    setDisplayName(userInfo.displayName)
     setFirstName(userInfo.firstName)
     setLastName(userInfo.lastName)
     setEmail(userInfo.email)
@@ -31,9 +33,21 @@ export default function EditProfileScreen({ navigation }) {
 
   const updateUserData = async () => {
     await updateDoc(doc(firestore, "users", userToken), {
+      displayName: displayName,
       firstName: firstName,
       lastName: lastName,
       email: email,
+    }).then(() => {
+      updateProfile(auth.currentUser, {
+        displayName: displayName,
+      }).then(() => {
+        dispatch(setUserInfo({
+          displayName: displayName,
+          firstName: firstName,
+          lastName: lastName,
+          email: email,
+        }))
+      })
     })
 
     if (pickedImage) {
@@ -55,44 +69,22 @@ export default function EditProfileScreen({ navigation }) {
       uploadBytes(storageRef, blob).then(async (snapshot) => {
         let i = await getDownloadURL(ref(storage, `users/${userToken}`))
 
-        updateProfile(auth.currentUser, {
-          displayName: `${firstName} ${lastName}`, 
+        await updateDoc(doc(firestore, "users", userToken), {
           photoURL: i,
         }).then(() => {
-          dispatch(setUserInfo({
-            name: `${firstName} ${lastName}`,
-            firstName: firstName,
-            lastName: lastName,
-            phone: auth.currentUser.phoneNumber,
-            email: email,
-            image: i,
-            thumbnail: pickedImage
-          }))
-    
-          navigation.navigate('Profile')
-        }).catch((error) => {
-          
-        });
-      });
-    } else {
-      updateProfile(auth.currentUser, {
-        displayName: `${firstName} ${lastName}`, 
-      }).then(() => {
-        dispatch(setUserInfo({
-          name: `${firstName} ${lastName}`,
-          firstName: firstName,
-          lastName: lastName,
-          phone: auth.currentUser.phoneNumber,
-          email: email,
-          image: userInfo.image,
-          thumbnail: userInfo.thumbnail
-        }))
-  
-        navigation.navigate('Profile')
-      }).catch((error) => {
-        
+          updateProfile(auth.currentUser, {
+            photoURL: i,
+          }).then(() => {
+            dispatch(setUserInfo({
+              image: i,
+              thumbnail: pickedImage
+            }))
+          })
+        })
       });
     }
+
+    navigation.navigate('Profile')
   }
 
   const pickImage = async () => {
@@ -136,6 +128,13 @@ export default function EditProfileScreen({ navigation }) {
           </View>
         </TouchableWithoutFeedback>
         <View style={styles.inputContainer}>
+          <TextInput 
+            placeholder='Display Name'
+            onChangeText={setDisplayName}
+            value={displayName}
+            style={styles.input}
+          />
+
           <TextInput 
             placeholder='First Name'
             onChangeText={setFirstName}

@@ -13,7 +13,7 @@ export const authSlice = createSlice({
       state.userToken = action.payload;
     },
     setUserInfo: (state, action) => {
-      state.userInfo = action.payload;
+      Object.assign(state.userInfo, action.payload);
     },
   }
 })

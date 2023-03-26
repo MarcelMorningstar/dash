@@ -12,6 +12,7 @@ import MapViewDirections from 'react-native-maps-directions'
 import Map from '../components/Map'
 import DriverMarker from '../components/DriverMarker'
 import ButtomSheet from '../components/ButtomSheet'
+import FirstTimeForm from '../components/FirstTimeForm'
 
 import Colors from '../constants/Colors'
 
@@ -46,7 +47,6 @@ export default function HomeScreen() {
   const orderType = useSelector(selectOrderType)
   const orderInformation = useSelector(selectOrderInformation)
 
-  const [typeMenu, setTypeMenu] = useState(false)
   const [directionsView, setDirectionsView] = useState(false)
   const [destinationMenu, setDestinationMenu] = useState(false)
   const [drivers, setDrivers] = useState([])
@@ -322,6 +322,8 @@ export default function HomeScreen() {
         fitDerection={fitDerection}
         fitUser={fitUser}
       />
+
+      { Object.keys(userInfo).length === 0 && <FirstTimeForm userToken={userToken} /> }
     </View>
   )
 }

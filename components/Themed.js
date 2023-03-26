@@ -84,7 +84,7 @@ export function View(props) {
   const color = useThemeColor('background')
   const shadow = useThemeColor('shadow')
 
-  return <DefaultSafeAreaView style={[{ backgroundColor: color, shadowColor: shadow }, style]} {...otherProps} />;
+  return <DefaultView style={[{ backgroundColor: color, shadowColor: shadow }, style]} {...otherProps} />;
 }
 
 export function SafeAreaView(props) {
