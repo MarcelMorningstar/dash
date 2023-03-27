@@ -62,19 +62,24 @@ function RootNavigator() {
           }))
   
           const docSnap = await getDoc(doc(firestore, "users", user.uid))
-          const fileUri = FileSystem.documentDirectory + "photo";
+
+          if (docSnap.exists()) {
+            const fileUri = FileSystem.documentDirectory + "photo"
           
-          FileSystem.downloadAsync(user.photoURL, fileUri)
-  
-          dispatch(setUserInfo({
-            name: user.displayName,
-            firstName: docSnap.data().firstName,
-            lastName: docSnap.data().lastName,
-            phone: user.phoneNumber,
-            email: docSnap.data().email,
-            image: user.photoURL,
-            thumbnail: fileUri
-          }))
+            FileSystem.downloadAsync(docSnap.data().photoURL, fileUri)
+            
+            dispatch(setUserInfo({
+              displayName: docSnap.data().displayName,
+              firstName: docSnap.data().firstName,
+              lastName: docSnap.data().lastName,
+              phoneNumber: docSnap.data().phoneNumber,
+              email: docSnap.data().email,
+              image: docSnap.data().photoURL,
+              thumbnail: fileUri
+            }))
+          } else {
+            dispatch(setUserInfo(null))
+          }
   
           dispatch(setUserToken(user.uid))
         } catch (error) {
