@@ -17,9 +17,14 @@ import { GOOGLE_API_KEY } from '@env'
 
 const ButtomSheet = ({ userToken, origin, destination, orderToken, orderType, orderInformation, setStatus, cancelOrder, directionsView, setDirectionsView, fitDerection, fitUser }) => {
   const dispatch = useDispatch()
+  const [fromAddress, setFromAddress] = useState('')
   const [destinationAddress, setDestinationAddress] = useState('')
 
   const sheetHeight = useRef(new Animated.Value(0)).current;
+  const circleOpacity1 = useRef(new Animated.Value(1)).current;
+  const circleScale1 = useRef(new Animated.Value(1)).current;
+  const circleOpacity2 = useRef(new Animated.Value(0.4)).current;
+  const circleScale2 = useRef(new Animated.Value(0.7)).current;
   const [theme, setTheme] = useState(Appearance.getColorScheme());
 
   Appearance.addChangeListener((T) => {
@@ -27,7 +32,7 @@ const ButtomSheet = ({ userToken, origin, destination, orderToken, orderType, or
   })
 
   const bottomSheetModalRef = useRef(null);
-  const snapPoints = useMemo(() => [24, 107, 220, 320], []);
+  const snapPoints = useMemo(() => [24, 107, 220, 360], []);
 
   const handlePresentModalPress = useCallback(() => {
     bottomSheetModalRef.current?.present();
@@ -56,6 +61,61 @@ const ButtomSheet = ({ userToken, origin, destination, orderToken, orderType, or
       }
     );
   };
+
+  const waitStatus = () => {
+    Animated.loop(
+      Animated.parallel([
+        Animated.sequence([
+          Animated.timing(circleOpacity1, {
+            toValue: 0.4,
+            duration: 700,
+            useNativeDriver: true,
+          }),
+          Animated.timing(circleOpacity1, {
+            toValue: 1,
+            duration: 700,
+            useNativeDriver: true,
+          })
+        ]),
+        Animated.sequence([
+          Animated.timing(circleOpacity2, {
+            toValue: 1,
+            duration: 700,
+            useNativeDriver: true,
+          }),
+          Animated.timing(circleOpacity2, {
+            toValue: 0.4,
+            duration: 700,
+            useNativeDriver: true,
+          })
+        ]),
+        Animated.sequence([
+          Animated.timing(circleScale1, {
+            toValue: 0.7,
+            duration: 700,
+            useNativeDriver: true,
+          }),
+          Animated.timing(circleScale1, {
+            toValue: 1,
+            duration: 700,
+            useNativeDriver: true,
+          })
+        ]),
+        Animated.sequence([
+          Animated.timing(circleScale2, {
+            toValue: 1,
+            duration: 700,
+            useNativeDriver: true,
+          }),
+          Animated.timing(circleScale2, {
+            toValue: 0.7,
+            duration: 700,
+            useNativeDriver: true,
+          })
+        ]),
+      ])
+    ).start()
+  }
 
   const travelInfo = async () => {
     const response = await fetch(`https://maps.googleapis.com/maps/api/distancematrix/json?origins=${origin.latitude},${origin.longitude}&destinations=${destination.latitude},${destination.longitude}&units=metric&key=${GOOGLE_API_KEY}`)
@@ -150,8 +210,16 @@ const ButtomSheet = ({ userToken, origin, destination, orderToken, orderType, or
           <View style={styles.contentConainer}>
             {
               !!orderToken ? (
-                <View>
-                  <Text>Status</Text>
+                <View style={[styles.container, { height: 175 }]}>
+                  <View style={{ flexDirection: 'column', alignItems: 'center' }}>
+                    <View onLayout={waitStatus} style={{ flexDirection: 'row', marginBottom: 4 }}>
+                      <Animated.View style={{ width: 21, height: 21, marginHorizontal: 2, borderRadius: 11, backgroundColor: 'gray', opacity: circleOpacity2, transform: [{scale: circleScale2}] }}></Animated.View>
+                      <Animated.View style={{ width: 21, height: 21, marginHorizontal: 2, borderRadius: 11, backgroundColor: 'gray', opacity: circleOpacity1, transform: [{scale: circleScale1}] }}></Animated.View>
+                      <Animated.View style={{ width: 21, height: 21, marginHorizontal: 2, borderRadius: 11, backgroundColor: 'gray', opacity: circleOpacity2, transform: [{scale: circleScale2}] }}></Animated.View>
+                    </View>
+                    
+                    <Text style={{ fontSize: 15 }}>Waiting for a response from a driver</Text>
+                  </View>
 
                   <TouchableHighlight
                     activeOpacity={0.6}
@@ -167,7 +235,7 @@ const ButtomSheet = ({ userToken, origin, destination, orderToken, orderType, or
                   </TouchableHighlight>
                 </View>
               ) : directionsView ? (
-                <View style={{ height: 175, flexDirection: 'column', justifyContent: 'space-between' }}>
+                <View style={[styles.container, { height: 175 }]}>
                   <View style={{ height: 64 }}>
                     <ScrollView horizontal={true} showsHorizontalScrollIndicator={false}>
                       <TouchableOpacity style={styles.carType} onPress={() => {}}>
@@ -219,7 +287,7 @@ const ButtomSheet = ({ userToken, origin, destination, orderToken, orderType, or
                 </View>
               ) : (
                 <View>
-                  <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+                  <View style={styles.container}>
                     <TouchableOpacity style={styles.type} onPress={() => handleSnapPress(3)}>
                       <Text>1</Text>
                     </TouchableOpacity>
@@ -227,61 +295,107 @@ const ButtomSheet = ({ userToken, origin, destination, orderToken, orderType, or
                       <Text>2</Text>
                     </TouchableOpacity>
                   </View>
-        
-                  <GooglePlacesAutocomplete 
-                    placeholder='Type in your destination'
-                    nearbyPlacesAPI='GooglePlacesSearch'
-                    query={{
-                      key: GOOGLE_API_KEY,
-                      language: 'en',
-                    }}
-                    fetchDetails={true}
-                    onChangeText={setDestinationAddress}
-                    value={destinationAddress}
-                    onPress={(data, details = null) => {
-                      Keyboard.dismiss()
 
-                      dispatch(setDestination({
-                        latitude: details.geometry.location.lat,
-                        longitude: details.geometry.location.lng,
-                        address: details.formatted_address
-                      }))
-        
-                      setDirectionsView(true)
+                  <View style={{ marginTop: 16 }}>
+                    <GooglePlacesAutocomplete 
+                      placeholder='Type in your location'
+                      currentLocationLabel='My location'
+                      nearbyPlacesAPI='GooglePlacesSearch'
+                      query={{
+                        key: GOOGLE_API_KEY,
+                        language: 'en',
+                      }}
+                      fetchDetails={true}
+                      // currentLocation={true}
+                      onChangeText={setFromAddress}
+                      value={fromAddress}
+                      onPress={() => {}}
+                      minLength={2}
+                      styles={{
+                        container: {
+                          flex: 0,
+                        },
+                        textInput: {
+                          color: Colors[theme]['text'],
+                          backgroundColor: Colors[theme]['secondaryBackground'],
+                          fontSize: 18,
+                          borderRadius: 12
+                        },
+                        listView: {
+                          position: 'absolute',
+                          top: 106,
+                          height: 130,
+                        },
+                        row: {
+                          backgroundColor: Colors[theme]['background']
+                        },
+                        description: {
+                          color: Colors[theme]['text']
+                        },
+                        separator: {
+                          backgroundColor: Colors[theme]['placeholderText']
+                        }
+                      }}
+                      textInputProps={{
+                        placeholderTextColor: Colors[theme]['placeholderText'],
+                      }}
+                      enablePoweredByContainer={false}
+                    />
+          
+                    <GooglePlacesAutocomplete 
+                      placeholder='Type in your destination'
+                      nearbyPlacesAPI='GooglePlacesSearch'
+                      query={{
+                        key: GOOGLE_API_KEY,
+                        language: 'en',
+                      }}
+                      fetchDetails={true}
+                      onChangeText={setDestinationAddress}
+                      value={destinationAddress}
+                      onPress={(data, details = null) => {
+                        Keyboard.dismiss()
 
-                      handleSnapPress(2)
-                    }}
-                    minLength={2}
-                    styles={{
-                      container: {
-                        flex: 0,
-                        marginVertical: 16,
-                      },
-                      textInput: {
-                        color: Colors[theme]['text'],
-                        placeholderTextColor: 'blue',
-                        backgroundColor: Colors[theme]['secondaryBackground'],
-                        fontSize: 18,
-                        borderRadius: 12
-                      },
-                      listView: {
-                        height: 144,
-                      },
-                      row: {
-                        backgroundColor: Colors[theme]['background']
-                      },
-                      description: {
-                        color: Colors[theme]['text']
-                      },
-                      separator: {
-                        backgroundColor: Colors[theme]['placeholderText']
-                      }
-                    }}
-                    textInputProps={{
-                      placeholderTextColor: Colors[theme]['placeholderText'],
-                    }}
-                    enablePoweredByContainer={false}
-                  />
+                        dispatch(setDestination({
+                          latitude: details.geometry.location.lat,
+                          longitude: details.geometry.location.lng,
+                          address: details.formatted_address
+                        }))
+          
+                        setDirectionsView(true)
+
+                        handleSnapPress(2)
+                      }}
+                      minLength={2}
+                      styles={{
+                        container: {
+                          flex: 0,
+                          marginVertical: 4,
+                        },
+                        textInput: {
+                          color: Colors[theme]['text'],
+                          backgroundColor: Colors[theme]['secondaryBackground'],
+                          fontSize: 18,
+                          borderRadius: 12
+                        },
+                        listView: {
+                          height: 130,
+                        },
+                        row: {
+                          backgroundColor: Colors[theme]['background']
+                        },
+                        description: {
+                          color: Colors[theme]['text']
+                        },
+                        separator: {
+                          backgroundColor: Colors[theme]['placeholderText']
+                        }
+                      }}
+                      textInputProps={{
+                        placeholderTextColor: Colors[theme]['placeholderText'],
+                      }}
+                      enablePoweredByContainer={false}
+                    />
+                  </View>
                 </View>
               )
             }
@@ -296,6 +410,10 @@ const styles = StyleSheet.create({
   contentConainer: {
     paddingVertical: 8,
     paddingHorizontal: 24
+  },
+  container: {
+    flexDirection: 'column', 
+    justifyContent: 'space-between'
   },
   row: {
     flexDirection: 'row'
