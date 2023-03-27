@@ -286,13 +286,16 @@ const ButtomSheet = ({ userToken, origin, destination, orderToken, orderType, or
                   </View>
                 </View>
               ) : (
-                <View>
-                  <View style={styles.container}>
+                <View style={styles.container}>
+                  <View style={[styles.row, { justifyContent: 'space-between' }]}>
                     <TouchableOpacity style={styles.type} onPress={() => handleSnapPress(3)}>
                       <Text>1</Text>
                     </TouchableOpacity>
                     <TouchableOpacity style={styles.type} onPress={() => handleSnapPress(3)}>
                       <Text>2</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={styles.type} onPress={() => handleSnapPress(3)}>
+                      <Text>3</Text>
                     </TouchableOpacity>
                   </View>
 
@@ -419,7 +422,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row'
   },
   type: {
-    width: '48%', 
+    width: '31%', 
     height: 64, 
     alignItems: 'center', 
     justifyContent: 'center',
