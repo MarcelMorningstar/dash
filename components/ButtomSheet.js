@@ -1,5 +1,5 @@
 import React, { useCallback, useRef, useMemo, useEffect, useState } from "react";
-import { Animated, Appearance, Keyboard, ScrollView, StyleSheet, TouchableHighlight, TouchableOpacity, View } from "react-native";
+import { Animated, Appearance, Image, Keyboard, ScrollView, StyleSheet, TouchableHighlight, TouchableOpacity, View } from "react-native";
 import { Text, PrimaryTouchableHighlight, FontAwesome5 } from "./Themed";
 import { Ionicons } from '@expo/vector-icons'; 
 import { BottomSheetModal, BottomSheetModalProvider } from "@gorhom/bottom-sheet";
@@ -9,7 +9,7 @@ import Colors from "../constants/Colors";
 
 import { useDispatch } from 'react-redux'
 import { setDestination } from "../slices/mainSlice";
-import { setOrderToken, setOrderInformation } from "../slices/orderSlice";
+import { setOrderToken, setOrderInformation, setOrderType } from "../slices/orderSlice";
 
 import { collection, addDoc } from "firebase/firestore";
 import { firestore } from "../firebase";
@@ -329,14 +329,32 @@ const ButtomSheet = ({ userToken, origin, destination, orderToken, orderType, or
               ) : (
                 <View style={styles.container}>
                   <View style={[styles.row, { justifyContent: 'space-between' }]}>
-                    <TouchableOpacity style={styles.type} onPress={() => handleSnapPress(3)}>
-                      <Text>1</Text>
+                    <TouchableOpacity style={[styles.type, orderType === 'taxi' ? { backgroundColor: 'gray' } : { backgroundColor: 'lightgray' } ]} onPress={() => { dispatch(setOrderType('taxi')); handleSnapPress(3) }}>
+                      <Image
+                        source={require("../assets/taxi.png")}
+                        style={{
+                          width: '58%',
+                          resizeMode: 'contain'
+                        }}
+                      />
                     </TouchableOpacity>
-                    <TouchableOpacity style={styles.type} onPress={() => handleSnapPress(3)}>
-                      <Text>2</Text>
+                    <TouchableOpacity style={[styles.type, orderType === 'secondDriver' ? { backgroundColor: 'gray' } : { backgroundColor: 'lightgray' } ]} onPress={() => { dispatch(setOrderType('secondDriver')); handleSnapPress(3) }}>
+                      <Image
+                        source={require("../assets/driver.png")}
+                        style={{
+                          width: '42%',
+                          resizeMode: 'contain'
+                        }}
+                      />
                     </TouchableOpacity>
-                    <TouchableOpacity style={styles.type} onPress={() => handleSnapPress(3)}>
-                      <Text>3</Text>
+                    <TouchableOpacity style={[styles.type, orderType === 'package' ? { backgroundColor: 'gray' } : { backgroundColor: 'lightgray' } ]} onPress={() => { dispatch(setOrderType('package')); handleSnapPress(3) }}>
+                      <Image
+                        source={require("../assets/package.png")}
+                        style={{
+                          width: '42%',
+                          resizeMode: 'contain'
+                        }}
+                      />
                     </TouchableOpacity>
                   </View>
 
@@ -467,7 +485,6 @@ const styles = StyleSheet.create({
     height: 64, 
     alignItems: 'center', 
     justifyContent: 'center',
-    backgroundColor: 'gray',
     borderRadius: 12
   },
   carType: {
