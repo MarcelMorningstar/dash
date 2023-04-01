@@ -49,29 +49,29 @@ export default function HistoryItem({ item, selectedId, setSelectedId }) {
     return (
         <View>
             <TouchableWithoutFeedback onPress={() => item.id !== selectedId ? setSelectedId(item.id) : setSelectedId(null)}>
-            <View style={styles.column}>
-                <View style={[styles.row, styles.item]}>
-                    <View style={[styles.row, {maxWidth: '66%'}]}>
-                        <View style={styles.picContainer}></View>
-                    
-                        <View>
-                        <View style={[styles.row, { flexWrap: 'wrap', alignItems: 'center' }]}>
-                            <Text style={styles.travelInformation}>{ item.travelInformation.distance } km</Text>
-                            <Text style={styles.circle}>●</Text>
-                            { hours != 0 && <Text style={styles.travelInformation}>{ `${hours} ${ hours == 1 ? 'hour' : 'hours' }` }</Text> }
-                            { hours != 0 && minutes != 0 && <Text style={styles.travelInformation}>{ ', ' }</Text> }
-                            { minutes != 0 && <Text style={styles.travelInformation}>{ `${minutes} ${ minutes == 1 ? 'minute' : 'minutes' }` }</Text> }
-                            { seconds != 0 && <Text style={styles.travelInformation}>{ `${seconds} seconds` }</Text> }
+                <View style={styles.column}>
+                    <View style={[styles.row, styles.item]}>
+                        <View style={[styles.row, {maxWidth: '66%'}]}>
+                            <View style={styles.picContainer}></View>
+                        
+                            <View>
+                                <View style={[styles.row, { flexWrap: 'wrap', alignItems: 'center' }]}>
+                                    <Text style={styles.travelInformation}>{ item.travelInformation.distance } km</Text>
+                                    <Text style={styles.circle}>●</Text>
+                                    { hours != 0 && <Text style={styles.travelInformation}>{ `${hours} ${ hours == 1 ? 'hour' : 'hours' }` }</Text> }
+                                    { hours != 0 && minutes != 0 && <Text style={styles.travelInformation}>{ ', ' }</Text> }
+                                    { minutes != 0 && <Text style={styles.travelInformation}>{ `${minutes} ${ minutes == 1 ? 'minute' : 'minutes' }` }</Text> }
+                                    { seconds != 0 && <Text style={styles.travelInformation}>{ `${seconds} seconds` }</Text> }
+                                </View>
+                                <Text style={styles.date}>{ Moment(item.created_at).format('HH:mm, MMMM D, YYYY') }</Text>
+                            </View>
                         </View>
-                        <Text style={styles.date}>{ Moment(item.created_at).format('HH:mm, MMMM D, YYYY') }</Text>
-                        </View>
+                        
+                        <Text style={styles.price}>{item.price.toFixed(2)}€</Text>
                     </View>
-                    
-                    <Text style={styles.price}>{item.price.toFixed(2)}€</Text>
-                </View>
 
-                <Directions display={display} addressFrom={item.user.address} addressTo={item.destination.address} />
-            </View>
+                    <Directions display={display} addressFrom={item.pick_up.address} addressTo={item.destination.address} />
+                </View>
             </TouchableWithoutFeedback>
 
             <View style={styles.line}></View>

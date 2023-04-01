@@ -21,7 +21,7 @@ export default function HistoryScreen({ navigation }) {
 
   const readUserHistory = async (userToken) => {
     let data = []
-    const q = query(collection(firestore, "calls"), where("user.id", "==", userToken), where("status", "==", 'done'))
+    const q = query(collection(firestore, "calls"), where("user", "==", userToken), where("status", "==", 'done'))
     const querySnapshot = await getDocs(q)
 
     querySnapshot.forEach((doc) => {
