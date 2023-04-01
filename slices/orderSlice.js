@@ -3,7 +3,7 @@ import { createSlice } from "@reduxjs/toolkit";
 const initialState = {
   orderToken: null,
   orderType: 'taxi',
-  orderInformation: null
+  orderInformation: {}
 }
 
 export const orderSlice = createSlice({
@@ -17,7 +17,7 @@ export const orderSlice = createSlice({
       state.orderType = action.payload;
     },
     setOrderInformation: (state, action) => {
-      state.orderInformation = action.payload;
+      Object.assign(state.orderInformation, action.payload);
     }
   }
 })

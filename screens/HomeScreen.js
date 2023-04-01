@@ -19,7 +19,7 @@ import Colors from '../constants/Colors'
 import { useSelector, useDispatch } from 'react-redux'
 import { selectDestination, selectOrigin, setDestination, setOrigin } from '../slices/mainSlice'
 import { selectUserInfo, selectUserToken } from '../slices/authSlice'
-import { selectOrderInformation, selectOrderToken, selectOrderType, setOrderInformation, setOrderToken } from '../slices/orderSlice'
+import { selectOrderInformation, selectOrderToken, selectOrderType, setOrderInformation, setOrderToken, setOrderType } from '../slices/orderSlice'
 
 import { collection, query, where, onSnapshot, doc, updateDoc } from "firebase/firestore";
 import { ref, set } from "firebase/database"
@@ -48,9 +48,8 @@ export default function HomeScreen() {
   const orderInformation = useSelector(selectOrderInformation)
 
   const [directionsView, setDirectionsView] = useState(false)
-  const [destinationMenu, setDestinationMenu] = useState(false)
   const [drivers, setDrivers] = useState([])
-  const [status, setStatus] = useState('')
+  const [status, setStatus] = useState('done')
 
   const styles = StyleSheet.create({
     inputContainer: {
@@ -112,7 +111,9 @@ export default function HomeScreen() {
   }, [])
 
   useEffect(() => {
-    if (status == 'in wait') {
+    
+
+    if (status !== 'done') {
       registerBackgroundFetchAsync() 
 
       updateUserLocation()
@@ -120,14 +121,24 @@ export default function HomeScreen() {
         updateUserLocation()
       }, 5000)
 
-      const orderUpdates = onSnapshot(doc(firestore, "calls", orderToken), (snapshot) => {
+      const orderUpdates = onSnapshot(doc(firestore, "calls", orderToken), (snapshot) => { // ???
         let data = snapshot.data()
 
         console.log(data)
-  
+
         setStatus(data.status)
+        dispatch(setOrderInformation({
+          status: data.status
+        }))
       });
     } else {
+      dispatch(setDestination(null))
+      dispatch(setOrderToken(null))
+      dispatch(setOrderType('taxi'))
+      dispatch(setOrderInformation(null))
+
+      setDirectionsView(false)
+
       unregisterBackgroundFetchAsync()
 
       clearInterval(userLoactionUpdateInterval.current)
@@ -153,15 +164,13 @@ export default function HomeScreen() {
   }
 
   const cancelOrder = async (orderToken) => {
-    dispatch(setDestination(null))
-    dispatch(setOrderToken(null))
-    dispatch(setOrderInformation(null))
-
-    const callRef = doc(firestore, "calls", orderToken);
+    const callRef = doc(firestore, "calls", orderToken)
 
     await updateDoc(callRef, {
       status: 'canceled'
-    });
+    })
+
+    setStatus('done')
   }
 
   TaskManager.defineTask(BACKGROUND_FETCH_TASK, () => {
@@ -315,6 +324,7 @@ export default function HomeScreen() {
         orderToken={orderToken}
         orderType={orderType}
         orderInformation={orderInformation}
+        status={status}
         setStatus={setStatus}
         cancelOrder={cancelOrder}
         directionsView={directionsView}

@@ -1,6 +1,7 @@
 import React, { useCallback, useRef, useMemo, useEffect, useState } from "react";
 import { Animated, Appearance, Keyboard, ScrollView, StyleSheet, TouchableHighlight, TouchableOpacity, View } from "react-native";
 import { Text, PrimaryTouchableHighlight, FontAwesome5 } from "./Themed";
+import { Ionicons } from '@expo/vector-icons'; 
 import { BottomSheetModal, BottomSheetModalProvider } from "@gorhom/bottom-sheet";
 import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete'
 
@@ -15,7 +16,7 @@ import { firestore } from "../firebase";
 
 import { GOOGLE_API_KEY } from '@env'
 
-const ButtomSheet = ({ userToken, origin, destination, orderToken, orderType, orderInformation, setStatus, cancelOrder, directionsView, setDirectionsView, fitDerection, fitUser }) => {
+const ButtomSheet = ({ userToken, origin, destination, orderToken, orderType, orderInformation, status, setStatus, cancelOrder, directionsView, setDirectionsView, fitDerection, fitUser }) => {
   const dispatch = useDispatch()
   const [fromAddress, setFromAddress] = useState('')
   const [destinationAddress, setDestinationAddress] = useState('')
@@ -50,6 +51,14 @@ const ButtomSheet = ({ userToken, origin, destination, orderToken, orderType, or
     handlePresentModalPress()
   }, [])
 
+  useEffect(() => {
+    if (status == 'done') {
+      handleSnapPress(1)
+    } else if (status == 'in progress') {
+      handleSnapPress(0)
+    }
+  }, [status])
+  
   const animation = (endValue) => {
     Animated.timing(sheetHeight, {
       toValue: endValue - 12,
@@ -212,22 +221,54 @@ const ButtomSheet = ({ userToken, origin, destination, orderToken, orderType, or
               !!orderToken ? (
                 <View style={[styles.container, { height: 175 }]}>
                   <View style={{ flexDirection: 'column', alignItems: 'center' }}>
-                    <View onLayout={waitStatus} style={{ flexDirection: 'row', marginBottom: 4 }}>
-                      <Animated.View style={{ width: 21, height: 21, marginHorizontal: 2, borderRadius: 11, backgroundColor: 'gray', opacity: circleOpacity2, transform: [{scale: circleScale2}] }}></Animated.View>
-                      <Animated.View style={{ width: 21, height: 21, marginHorizontal: 2, borderRadius: 11, backgroundColor: 'gray', opacity: circleOpacity1, transform: [{scale: circleScale1}] }}></Animated.View>
-                      <Animated.View style={{ width: 21, height: 21, marginHorizontal: 2, borderRadius: 11, backgroundColor: 'gray', opacity: circleOpacity2, transform: [{scale: circleScale2}] }}></Animated.View>
-                    </View>
+                    {
+                      status === 'in wait' || status === 'waiting driver' ? (
+                        <View onLayout={waitStatus} style={{ flexDirection: 'row', marginBottom: 4 }}>
+                          <Animated.View style={{ width: 21, height: 21, marginHorizontal: 2, borderRadius: 11, backgroundColor: 'gray', opacity: circleOpacity2, transform: [{scale: circleScale2}] }}></Animated.View>
+                          <Animated.View style={{ width: 21, height: 21, marginHorizontal: 2, borderRadius: 11, backgroundColor: 'gray', opacity: circleOpacity1, transform: [{scale: circleScale1}] }}></Animated.View>
+                          <Animated.View style={{ width: 21, height: 21, marginHorizontal: 2, borderRadius: 11, backgroundColor: 'gray', opacity: circleOpacity2, transform: [{scale: circleScale2}] }}></Animated.View>
+                        </View>
+                      ) : status === 'arrived' && (
+                        <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4, paddingVertical: 4, paddingLeft: 4, paddingRight: 16, backgroundColor: 'lightgray', borderRadius: 24 }}>
+                          <Ionicons name="checkmark-circle" size={28} color="green" style={{ marginRight: 5 }} />
+                          <Text style={{ fontSize: 14, fontWeight: '500' }}>Arrived</Text>
+                        </View>
+                      )
+                    }
                     
-                    <Text style={{ fontSize: 15 }}>Waiting for a response from a driver</Text>
+                    {
+                      status === 'in wait' ? (
+                        <Text style={{ fontSize: 15 }}>Waiting for a response from a driver</Text>
+                      ) : status === 'waiting driver' ? ( 
+                        <View style={{ width: '100%', alignItems: 'center' }}>
+                          <Text style={{ fontSize: 15 }}>Car will arrive in 5 min</Text>
+                          
+                          <View style={{ flexDirection: 'row', width: '100%', marginTop: 8 }}>
+                            <View style={{ width: 48, height: 48, marginRight: 12, backgroundColor: 'gray', borderRadius: 24 }}></View>
+                            <View style={{ flexDirection: 'column', justifyContent: 'center' }}>
+                              <Text style={{ fontSize: 15 }}>Mercedes i8</Text>
+                              <Text>LV-0000</Text>
+                            </View>
+                          </View>
+                        </View>
+                      ) : status === 'arrived' && (
+                        <View style={{ flexDirection: 'row', width: '100%', marginTop: 8 }}>
+                          <View style={{ width: 48, height: 48, marginRight: 12, backgroundColor: 'gray', borderRadius: 24 }}></View>
+                          <View style={{ flexDirection: 'column', justifyContent: 'center' }}>
+                            <Text style={{ fontSize: 15 }}>Mercedes Sprinter</Text>
+                            <Text>LV-0000</Text>
+                          </View>
+                        </View>
+                      )
+                    }
                   </View>
-
+                  
                   <TouchableHighlight
                     activeOpacity={0.6}
                     underlayColor="#6A6A6A"
                     style={[styles.button, { width: '100%', backgroundColor: '#555555' }]}
                     onPress={() => {
                       cancelOrder(orderToken)
-                      setDirectionsView(false)
                       handleSnapPress(3)
                     }}
                   >
