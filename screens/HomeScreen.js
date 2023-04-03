@@ -111,38 +111,42 @@ export default function HomeScreen() {
   }, [])
 
   useEffect(() => {
-    
+    if (!!orderToken) {
+      if (status !== 'done') {
+        const orderUpdates = onSnapshot(doc(firestore, "calls", orderToken), (snapshot) => {
+          let data = snapshot.data()
+  
+          console.log(data)
+  
+          setStatus(data.status)
+          dispatch(setOrderInformation({
+            status: data.status
+          }))
+        },);
 
-    if (status !== 'done') {
-      registerBackgroundFetchAsync() 
-
-      updateUserLocation()
-      userLoactionUpdateInterval.current = setInterval(() => {
+        registerBackgroundFetchAsync()
+  
         updateUserLocation()
-      }, 5000)
+        userLoactionUpdateInterval.current = setInterval(() => {
+          updateUserLocation()
+        }, 5000)
+      } else {
+        unregisterBackgroundFetchAsync()
+    
+        clearInterval(userLoactionUpdateInterval.current)
+        userLoactionUpdateInterval.current = null
 
-      const orderUpdates = onSnapshot(doc(firestore, "calls", orderToken), (snapshot) => { // ???
-        let data = snapshot.data()
+        dispatch(setDestination(null))
+        dispatch(setOrderToken(null))
+        dispatch(setOrderType('taxi'))
+        dispatch(setOrderInformation(null))
 
-        console.log(data)
-
-        setStatus(data.status)
-        dispatch(setOrderInformation({
-          status: data.status
-        }))
-      });
+        setDirectionsView(false)
+      }
     } else {
       dispatch(setDestination(null))
-      dispatch(setOrderToken(null))
-      dispatch(setOrderType('taxi'))
-      dispatch(setOrderInformation(null))
 
       setDirectionsView(false)
-
-      unregisterBackgroundFetchAsync()
-
-      clearInterval(userLoactionUpdateInterval.current)
-      userLoactionUpdateInterval.current = null
     }
   }, [status])
 
