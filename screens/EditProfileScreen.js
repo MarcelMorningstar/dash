@@ -102,7 +102,7 @@ export default function EditProfileScreen({ navigation }) {
   };
 
   return (
-    <Layout title='Edit Profile' navigation={navigation} backScreen='Profile' >
+    <Layout title='Edit Profile' navigation={navigation} backScreen='Profile'>
       <ScrollView contentContainerStyle={styles.container}>
         <TouchableWithoutFeedback onPress={pickImage}>
           <View style={styles.picContainer}>

@@ -119,7 +119,8 @@ function BottomTabNavigator() {
       screenOptions={{
         tabBarShowLabel: false,
         tabBarActiveTintColor: Colors[theme]['primary']
-      }}>
+      }}
+    >
       <BottomTab.Screen
         name="History"
         component={HistoryScreen}
@@ -160,7 +161,7 @@ function BottomTabNavigator() {
           tabBarIcon: ({ color }) => <Ionicons name="settings-outline" color={color} size={30} style={{ marginBottom: -3 }} />,
           headerShown: false,
         }}
-      /> 
+      />
     </BottomTab.Navigator>
   )
 }
