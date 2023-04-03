@@ -333,16 +333,16 @@ const ButtomSheet = ({ userToken, origin, destination, orderToken, orderType, or
                       <Image
                         source={require("../assets/taxi.png")}
                         style={{
-                          width: '58%',
+                          width: '69%',
                           resizeMode: 'contain'
                         }}
                       />
                     </TouchableOpacity>
-                    <TouchableOpacity style={[styles.type, orderType === 'secondDriver' ? { backgroundColor: 'gray' } : { backgroundColor: 'lightgray' } ]} onPress={() => { dispatch(setOrderType('secondDriver')); handleSnapPress(3) }}>
+                    <TouchableOpacity style={[styles.type, orderType === 'second driver' ? { backgroundColor: 'gray' } : { backgroundColor: 'lightgray' } ]} onPress={() => { dispatch(setOrderType('second driver')); handleSnapPress(3) }}>
                       <Image
                         source={require("../assets/driver.png")}
                         style={{
-                          width: '42%',
+                          width: '52%',
                           resizeMode: 'contain'
                         }}
                       />
@@ -351,7 +351,16 @@ const ButtomSheet = ({ userToken, origin, destination, orderToken, orderType, or
                       <Image
                         source={require("../assets/package.png")}
                         style={{
-                          width: '42%',
+                          width: '52%',
+                          resizeMode: 'contain'
+                        }}
+                      />
+                    </TouchableOpacity>
+                    <TouchableOpacity style={[styles.type, orderType === 'tow-truck' ? { backgroundColor: 'gray' } : { backgroundColor: 'lightgray' } ]} onPress={() => { dispatch(setOrderType('package')); handleSnapPress(3) }}>
+                      <Image
+                        source={require("../assets/tow-truck.png")}
+                        style={{
+                          width: '70%',
                           resizeMode: 'contain'
                         }}
                       />
@@ -481,7 +490,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row'
   },
   type: {
-    width: '31%', 
+    width: '24%', 
     height: 64, 
     alignItems: 'center', 
     justifyContent: 'center',
