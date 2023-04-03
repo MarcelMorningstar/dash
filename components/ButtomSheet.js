@@ -356,7 +356,7 @@ const ButtomSheet = ({ userToken, origin, destination, orderToken, orderType, or
                         }}
                       />
                     </TouchableOpacity>
-                    <TouchableOpacity style={[styles.type, orderType === 'tow-truck' ? { backgroundColor: 'gray' } : { backgroundColor: 'lightgray' } ]} onPress={() => { dispatch(setOrderType('package')); handleSnapPress(3) }}>
+                    <TouchableOpacity style={[styles.type, orderType === 'tow-truck' ? { backgroundColor: 'gray' } : { backgroundColor: 'lightgray' } ]} onPress={() => { dispatch(setOrderType('tow-truck')); handleSnapPress(3) }}>
                       <Image
                         source={require("../assets/tow-truck.png")}
                         style={{
@@ -369,7 +369,7 @@ const ButtomSheet = ({ userToken, origin, destination, orderToken, orderType, or
 
                   <View style={{ marginTop: 16 }}>
                     <GooglePlacesAutocomplete 
-                      placeholder='Type in your location'
+                      placeholder='Current location'
                       currentLocationLabel='My location'
                       nearbyPlacesAPI='GooglePlacesSearch'
                       query={{
