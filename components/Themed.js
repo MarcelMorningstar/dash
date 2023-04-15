@@ -1,51 +1,95 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Appearance, Text as DefaultText, TextInput as DefaultTextInput, View as DefaultView, SafeAreaView as DefaultSafeAreaView, TouchableHighlight as DefaultTouchableHighlight, TouchableOpacity as DefaultTouchableOpacity, StatusBar as DefaultStatusBar } from 'react-native'
 import { DarkTheme, DefaultTheme, NavigationContainer as DefaultNavigationContainer } from '@react-navigation/native'
 import { Divider as DefaultDivider } from './Divider'
 import { AntDesign as DefaultAntDesing, MaterialIcons as DefaultMaterialIcons, MaterialCommunityIcons as DefaultMaterialCommunityIcons, Feather as DefaultFeather, FontAwesome5 as DefaultFontAwesome5, Ionicons as DefaultIonicons } from '@expo/vector-icons'
 import Colors from '../constants/Colors'
 
+import { useSelector } from 'react-redux'
+import { selectTheme } from '../slices/authSlice'
+
 export function useThemeColor(colorName) {
-  const [theme, setTheme] = useState(Appearance.getColorScheme());
+  const storageTheme = useSelector(selectTheme);
+  const [theme, setTheme] = useState(storageTheme === 'automatic' ? Appearance.getColorScheme() : storageTheme);
   const color = Colors[theme][colorName];
 
+  useEffect(() => {
+    if (storageTheme !== 'automatic') {
+      setTheme(storageTheme)
+    } else {
+      setTheme(Appearance.getColorScheme())
+    }
+  }, [storageTheme])
+  
   Appearance.addChangeListener((T) => {
-    setTheme(T.colorScheme)
+    if (storageTheme === 'automatic') {
+      setTheme(T.colorScheme)
+    }
   })
 
   return color
 }
 
 export function StatusBar(props) {
-  let theme = Appearance.getColorScheme();
-  const [Theme, setTheme] = useState(theme === 'light' ? 'dark-content' : 'light-content')
+  let storageTheme = useSelector(selectTheme);
+  let [appearance, setAppearance] = useState(Appearance.getColorScheme());
+  const [theme, setTheme] = useState(storageTheme === 'automatic' ? appearance === 'light' ? 'dark-content' : 'light-content' : storageTheme === 'light' ? 'dark-content' : 'light-content');
   const { ...otherProps } = props;
 
-  Appearance.addChangeListener((T) => {
-    if (T.colorScheme == 'light') {
-      setTheme('dark-content')
+  useEffect(() => {
+    if (storageTheme === 'automatic') {
+      if (appearance === 'light') {
+        setTheme('dark-content')
+      } else {
+        setTheme('light-content')
+      }
     } else {
-      setTheme('light-content')
+      if (storageTheme === 'light') {
+        setTheme('dark-content')
+      } else {
+        setTheme('light-content')
+      }
+    }
+  }, [storageTheme, appearance])
+
+  Appearance.addChangeListener((T) => {
+    if (storageTheme === 'automatic') {
+      setAppearance(T.colorScheme)
     }
   })
 
-  return <DefaultStatusBar barStyle={Theme} translucent backgroundColor="transparent" {...otherProps} />;
+  return <DefaultStatusBar barStyle={theme} translucent backgroundColor="transparent" {...otherProps} />;
 }
 
 export function NavigationContainer(props) {
-  let theme = Appearance.getColorScheme();
-  const [Theme, setTheme] = useState(theme === 'light' ? DefaultTheme : DarkTheme)
+  let storageTheme = useSelector(selectTheme);
+  let [appearance, setAppearance] = useState(Appearance.getColorScheme());
+  const [theme, setTheme] = useState(storageTheme === 'automatic' ? appearance === 'light' ? DefaultTheme : DarkTheme : storageTheme === 'light' ? DefaultTheme : DarkTheme)
   const { ...otherProps } = props;
 
-  Appearance.addChangeListener((T) => {
-    if (T.colorScheme == 'light') {
-      setTheme(DefaultTheme)
+  useEffect(() => {
+    if (storageTheme === 'automatic') {
+      if (appearance === 'light') {
+        setTheme(DefaultTheme)
+      } else {
+        setTheme(DarkTheme)
+      }
     } else {
-      setTheme(DarkTheme)
+      if (storageTheme === 'light') {
+        setTheme(DefaultTheme)
+      } else {
+        setTheme(DarkTheme)
+      }
+    }
+  }, [storageTheme, appearance])
+
+  Appearance.addChangeListener((T) => {
+    if (storageTheme === 'automatic') {
+      setAppearance(T.colorScheme)
     }
   })
 
-  return <DefaultNavigationContainer theme={Theme} {...otherProps} />;
+  return <DefaultNavigationContainer theme={theme} {...otherProps} />;
 }
 
 export function Text(props) {

@@ -1,14 +1,28 @@
 import React, { useState } from 'react'
-import { Appearance, ScrollView, StyleSheet, View } from 'react-native'
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { ScrollView, StyleSheet, View } from 'react-native'
 import { Feather, FontAwesome5, Ionicons, Text, TouchableHighlight } from '../components/Themed'
 
 import Layout from '../components/Layout'
 import SettingsSection from '../components/SettingsSection'
 import Logout from '../components/Logout'
 
+import { useSelector, useDispatch } from 'react-redux';
+import { selectTheme, setTheme } from '../slices/authSlice';
+
 export default function SettingsScreen({ navigation }) {
-  const theme = Appearance.getColorScheme()
+  const dispatch = useDispatch()
+  const theme = useSelector(selectTheme)
   const [logout, setLogout] = useState(false)
+
+  const setStorageTheme = async (value) => {
+    try {
+      await AsyncStorage.setItem('theme', value)
+      dispatch(setTheme(value))
+    } catch(e) {
+
+    }
+  }
 
   return (
     <Layout title='Settings' navigation={navigation} backScreen='Home'>
@@ -31,7 +45,7 @@ export default function SettingsScreen({ navigation }) {
           <TouchableHighlight 
             activeOpacity={0.6}
             style={styles.option}
-            onPress={() => {}}
+            onPress={() => setStorageTheme('automatic')}
           >
             <View style={styles.optionContainer}>
               <View style={styles.optionLabel}>

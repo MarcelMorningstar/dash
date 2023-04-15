@@ -1,14 +1,28 @@
-import React, { useState } from 'react'
-import { StyleSheet, Appearance, useColorScheme } from 'react-native'
+import React, { useEffect, useState } from 'react'
+import { StyleSheet, Appearance } from 'react-native'
 import MapView, { PROVIDER_GOOGLE } from 'react-native-maps'
 
 import MapColor from '../constants/Map'
 
+import { useSelector } from 'react-redux'
+import { selectTheme } from '../slices/authSlice'
+
 export default function Map({ children, mapRef, origin, directionsView, userLocationChange, insets }) {
-  const [theme, setTheme] = useState(Appearance.getColorScheme());
+  const storageTheme = useSelector(selectTheme)
+  const [theme, setTheme] = useState(storageTheme === 'automatic' ? Appearance.getColorScheme() : storageTheme);
+
+  useEffect(() => {
+    if (storageTheme !== 'automatic') {
+      setTheme(storageTheme)
+    } else {
+      setTheme(Appearance.getColorScheme())
+    }
+  }, [storageTheme])
 
   Appearance.addChangeListener((T) => {
-    setTheme(T.colorScheme)
+    if (storageTheme === 'automatic') {
+      setTheme(T.colorScheme)
+    }
   })
 
   return (

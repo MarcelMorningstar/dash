@@ -7,9 +7,10 @@ import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplet
 
 import Colors from "../constants/Colors";
 
-import { useDispatch } from 'react-redux'
+import { useSelector, useDispatch } from 'react-redux'
 import { setDestination } from "../slices/mainSlice";
 import { setOrderToken, setOrderInformation, setOrderType } from "../slices/orderSlice";
+import { selectTheme } from '../slices/authSlice'
 
 import { collection, addDoc } from "firebase/firestore";
 import { firestore } from "../firebase";
@@ -26,10 +27,21 @@ const ButtomSheet = ({ userToken, origin, destination, orderToken, orderType, or
   const circleScale1 = useRef(new Animated.Value(1)).current;
   const circleOpacity2 = useRef(new Animated.Value(0.4)).current;
   const circleScale2 = useRef(new Animated.Value(0.7)).current;
-  const [theme, setTheme] = useState(Appearance.getColorScheme());
+  const storageTheme = useSelector(selectTheme)
+  const [theme, setTheme] = useState(storageTheme === 'automatic' ? Appearance.getColorScheme() : storageTheme);
+
+  useEffect(() => {
+    if (storageTheme !== 'automatic') {
+      setTheme(storageTheme)
+    } else {
+      setTheme(Appearance.getColorScheme())
+    }
+  }, [storageTheme])
 
   Appearance.addChangeListener((T) => {
-    setTheme(T.colorScheme)
+    if (storageTheme === 'automatic') {
+      setTheme(T.colorScheme)
+    }
   })
 
   const bottomSheetModalRef = useRef(null);
