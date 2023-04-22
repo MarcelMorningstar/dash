@@ -18,7 +18,7 @@ import Colors from '../constants/Colors'
 
 import { useSelector, useDispatch } from 'react-redux'
 import { selectDestination, selectOrigin, setDestination, setOrigin } from '../slices/mainSlice'
-import { selectUserInfo, selectUserToken } from '../slices/authSlice'
+import { selectUserInfo, selectUserToken, selectTheme } from '../slices/authSlice'
 import { selectOrderInformation, selectOrderToken, selectOrderType, setOrderInformation, setOrderToken, setOrderType } from '../slices/orderSlice'
 
 import { collection, query, where, onSnapshot, doc, updateDoc } from "firebase/firestore";
@@ -30,11 +30,11 @@ import { GOOGLE_API_KEY } from '@env'
 const BACKGROUND_FETCH_TASK = 'background-location-task';
 
 export default function HomeScreen() {
-  const theme = Appearance.getColorScheme()
+  const storageTheme = useSelector(selectTheme)
+  const [theme, setTheme] = useState(storageTheme === 'automatic' ? Appearance.getColorScheme() : storageTheme);
   const insets = useSafeAreaInsets()
 
   const mapRef = useRef(null)
-  const childRef = useRef(null)
 
   let userLoactionUpdateInterval = useRef()
 
@@ -84,6 +84,20 @@ export default function HomeScreen() {
       elevation: 7,
       shadowOffset: { width: 0, height: 0 },
       shadowOpacity: 0.25
+    }
+  })
+
+  useEffect(() => {
+    if (storageTheme !== 'automatic') {
+      setTheme(storageTheme)
+    } else {
+      setTheme(Appearance.getColorScheme())
+    }
+  }, [storageTheme])
+
+  Appearance.addChangeListener((T) => {
+    if (storageTheme === 'automatic') {
+      setTheme(T.colorScheme)
     }
   })
 
