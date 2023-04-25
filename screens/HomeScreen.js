@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react'
-import { Appearance, PixelRatio, Platform, StyleSheet, View } from 'react-native'
+import { Appearance, Image, PixelRatio, Platform, StyleSheet, View } from 'react-native'
 import { TouchableHighlight } from '../components/Themed'
 import * as BackgroundFetch from 'expo-background-fetch'
 import * as TaskManager from 'expo-task-manager'
@@ -292,6 +292,23 @@ export default function HomeScreen() {
           >
             <FontAwesome5 name="route" size={25} color="black" />
           </TouchableHighlight>
+        )
+      }
+
+      {
+        status === 'arrived' && (
+          <Image 
+            source={require("../assets/confetti.gif")}
+            style={{
+              position: 'absolute',
+              zIndex: 9999,
+              top: -60,
+              transform: [{rotate: '180deg'}],
+              height: '60%',
+              width: '100%',
+              resizeMode: 'contain'
+            }}
+          />
         )
       }
       

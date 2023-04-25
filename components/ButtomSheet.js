@@ -45,7 +45,7 @@ const ButtomSheet = ({ userToken, origin, pickUp, destination, orderToken, order
   })
 
   const bottomSheetModalRef = useRef(null);
-  const snapPoints = useMemo(() => [24, 107, 220, 360], []);
+  const snapPoints = useMemo(() => [24, 107, 228, 360], []);
 
   const handlePresentModalPress = useCallback(() => {
     bottomSheetModalRef.current?.present();
@@ -243,16 +243,21 @@ const ButtomSheet = ({ userToken, origin, pickUp, destination, orderToken, order
           <View style={styles.contentConainer}>
             {
               !!orderToken ? (
-                <View style={[styles.container, { height: 175 }]}>
+                <View style={[styles.container, { height: 183 }]}>
                   <View style={{ flexDirection: 'column', alignItems: 'center' }}>
                     {
-                      status === 'in wait' || status === 'waiting driver' ? (
+                      status === 'in wait' ? (
                         <View onLayout={waitStatus} style={{ flexDirection: 'row', marginBottom: 4 }}>
                           <Animated.View style={{ width: 21, height: 21, marginHorizontal: 2, borderRadius: 11, backgroundColor: 'gray', opacity: circleOpacity2, transform: [{scale: circleScale2}] }}></Animated.View>
                           <Animated.View style={{ width: 21, height: 21, marginHorizontal: 2, borderRadius: 11, backgroundColor: 'gray', opacity: circleOpacity1, transform: [{scale: circleScale1}] }}></Animated.View>
                           <Animated.View style={{ width: 21, height: 21, marginHorizontal: 2, borderRadius: 11, backgroundColor: 'gray', opacity: circleOpacity2, transform: [{scale: circleScale2}] }}></Animated.View>
                         </View>
-                      ) : status === 'arrived' && (
+                      ) : status === 'waiting driver' ? (
+                        <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4, paddingVertical: 4, paddingLeft: 4, paddingRight: 16, backgroundColor: 'lightgray', borderRadius: 24 }}>
+                          <Ionicons name="checkmark-circle" size={28} color="green" style={{ marginRight: 5 }} />
+                          <Text style={{ fontSize: 14, fontWeight: '500' }}>Accepted</Text>
+                        </View>
+                      ): status === 'arrived' && (
                         <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4, paddingVertical: 4, paddingLeft: 4, paddingRight: 16, backgroundColor: 'lightgray', borderRadius: 24 }}>
                           <Ionicons name="checkmark-circle" size={28} color="green" style={{ marginRight: 5 }} />
                           <Text style={{ fontSize: 14, fontWeight: '500' }}>Arrived</Text>
