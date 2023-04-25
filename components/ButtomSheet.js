@@ -338,6 +338,7 @@ const ButtomSheet = ({ userToken, origin, pickUp, destination, orderToken, order
                       style={[{ width: '32%', backgroundColor: '#555555' }, styles.button]}
                       onPress={() => {
                         dispatch(setDestination(null))
+                        dispatch(setPickUp(null))
 
                         setDirectionsView(false)
 

@@ -17,7 +17,7 @@ import FirstTimeForm from '../components/FirstTimeForm'
 import Colors from '../constants/Colors'
 
 import { useSelector, useDispatch } from 'react-redux'
-import { selectDestination, selectOrigin, selectPickUp, setDestination, setOrigin } from '../slices/mainSlice'
+import { selectDestination, selectOrigin, selectPickUp, setDestination, setOrigin, setPickUp } from '../slices/mainSlice'
 import { selectUserInfo, selectUserToken, selectTheme } from '../slices/authSlice'
 import { selectOrderInformation, selectOrderToken, selectOrderType, setOrderInformation, setOrderToken, setOrderType } from '../slices/orderSlice'
 
@@ -195,6 +195,8 @@ export default function HomeScreen() {
     })
 
     setStatus('done')
+
+    dispatch(setPickUp(null))
   }
 
   TaskManager.defineTask(BACKGROUND_FETCH_TASK, () => {
