@@ -8,7 +8,7 @@ import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplet
 import Colors from "../constants/Colors";
 
 import { useSelector, useDispatch } from 'react-redux'
-import { setDestination } from "../slices/mainSlice";
+import { setDestination, setPickUp } from "../slices/mainSlice";
 import { setOrderToken, setOrderInformation, setOrderType } from "../slices/orderSlice";
 import { selectTheme } from '../slices/authSlice'
 
@@ -17,7 +17,7 @@ import { firestore } from "../firebase";
 
 import { GOOGLE_API_KEY } from '@env'
 
-const ButtomSheet = ({ userToken, origin, destination, orderToken, orderType, orderInformation, status, setStatus, cancelOrder, directionsView, setDirectionsView, fitDerection, fitUser }) => {
+const ButtomSheet = ({ userToken, origin, pickUp, destination, orderToken, orderType, orderInformation, status, setStatus, cancelOrder, directionsView, setDirectionsView, fitDerection, fitUser }) => {
   const dispatch = useDispatch()
   const [fromAddress, setFromAddress] = useState('')
   const [destinationAddress, setDestinationAddress] = useState('')
@@ -179,14 +179,26 @@ const ButtomSheet = ({ userToken, origin, destination, orderToken, orderType, or
 
   const createCall = async () => {
     let travelInformation = await travelInfo()
-    let from = await addressFrom()
+    let fromLatitude
+    let fromLongitude
+    let fromAddress
+
+    if (pickUp) {
+      fromLatitude = pickUp.latitude
+      fromLongitude = pickUp.longitude
+      fromAddress = pickUp.address
+    } else {
+      fromLatitude = origin.latitude
+      fromLongitude = origin.longitude
+      fromAddress = await addressFrom()
+    }
 
     const docRef = await addDoc(collection(firestore, "calls"), {
       created_at: new Date(),
       pick_up: {
-        latitude: origin.latitude,
-        longitude: origin.longitude,
-        address: from
+        latitude: fromLatitude,
+        longitude: fromLongitude,
+        address: fromAddress
       },
       destination: destination,
       travelInformation: {
@@ -204,9 +216,9 @@ const ButtomSheet = ({ userToken, origin, destination, orderToken, orderType, or
     dispatch(setOrderInformation({
       status: 'in wait',
       pick_up: {
-        latitude: origin.latitude,
-        longitude: origin.longitude,
-        address: from
+        latitude: fromLatitude,
+        longitude: fromLongitude,
+        address: fromAddress
       },
       destination: destination,
       travelInformation: {
@@ -345,7 +357,7 @@ const ButtomSheet = ({ userToken, origin, destination, orderToken, orderType, or
                       <Image
                         source={require("../assets/taxi.png")}
                         style={{
-                          width: '69%',
+                          height: '111%',
                           resizeMode: 'contain'
                         }}
                       />
@@ -354,25 +366,7 @@ const ButtomSheet = ({ userToken, origin, destination, orderToken, orderType, or
                       <Image
                         source={require("../assets/driver.png")}
                         style={{
-                          width: '52%',
-                          resizeMode: 'contain'
-                        }}
-                      />
-                    </TouchableOpacity>
-                    <TouchableOpacity style={[styles.type, orderType === 'package' ? { backgroundColor: 'gray' } : { backgroundColor: 'lightgray' } ]} onPress={() => { dispatch(setOrderType('package')); handleSnapPress(3) }}>
-                      <Image
-                        source={require("../assets/package.png")}
-                        style={{
-                          width: '52%',
-                          resizeMode: 'contain'
-                        }}
-                      />
-                    </TouchableOpacity>
-                    <TouchableOpacity style={[styles.type, orderType === 'tow-truck' ? { backgroundColor: 'gray' } : { backgroundColor: 'lightgray' } ]} onPress={() => { dispatch(setOrderType('tow-truck')); handleSnapPress(3) }}>
-                      <Image
-                        source={require("../assets/tow-truck.png")}
-                        style={{
-                          width: '70%',
+                          height: '75%',
                           resizeMode: 'contain'
                         }}
                       />
@@ -392,7 +386,15 @@ const ButtomSheet = ({ userToken, origin, destination, orderToken, orderType, or
                       // currentLocation={true}
                       onChangeText={setFromAddress}
                       value={fromAddress}
-                      onPress={() => {}}
+                      onPress={(data, details = null) => {
+                        Keyboard.dismiss()
+
+                        dispatch(setPickUp({
+                          latitude: details.geometry.location.lat,
+                          longitude: details.geometry.location.lng,
+                          address: details.formatted_address
+                        }))
+                      }}
                       minLength={2}
                       styles={{
                         container: {
@@ -502,7 +504,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row'
   },
   type: {
-    width: '24%', 
+    width: '49%', 
     height: 64, 
     alignItems: 'center', 
     justifyContent: 'center',

@@ -17,7 +17,7 @@ import FirstTimeForm from '../components/FirstTimeForm'
 import Colors from '../constants/Colors'
 
 import { useSelector, useDispatch } from 'react-redux'
-import { selectDestination, selectOrigin, setDestination, setOrigin } from '../slices/mainSlice'
+import { selectDestination, selectOrigin, selectPickUp, setDestination, setOrigin } from '../slices/mainSlice'
 import { selectUserInfo, selectUserToken, selectTheme } from '../slices/authSlice'
 import { selectOrderInformation, selectOrderToken, selectOrderType, setOrderInformation, setOrderToken, setOrderType } from '../slices/orderSlice'
 
@@ -40,6 +40,7 @@ export default function HomeScreen() {
 
   const dispatch = useDispatch()
   const origin = useSelector(selectOrigin)
+  const pickUp = useSelector(selectPickUp)
   const destination = useSelector(selectDestination)
   const userToken = useSelector(selectUserToken)
   const userInfo = useSelector(selectUserInfo)
@@ -50,6 +51,11 @@ export default function HomeScreen() {
   const [directionsView, setDirectionsView] = useState(false)
   const [drivers, setDrivers] = useState([])
   const [status, setStatus] = useState('done')
+
+  useEffect(() => {
+    console.log(pickUp)
+  }, [pickUp])
+  
 
   const styles = StyleSheet.create({
     inputContainer: {
@@ -299,19 +305,19 @@ export default function HomeScreen() {
         }
 
         {
-          origin && destination && (
+          destination && (
             <Marker 
               identifier='origin'
               coordinate={{
-                latitude: origin.latitude,
-                longitude: origin.longitude,
+                latitude: pickUp ? pickUp.latitude : origin.latitude,
+                longitude: pickUp ? pickUp.longitude : origin.longitude,
               }}
             />
           )
         }
 
         {
-          origin && destination && (
+          destination && (
             <Marker 
               identifier='destination'
               coordinate={{
@@ -323,9 +329,9 @@ export default function HomeScreen() {
         }
 
         {
-          origin && destination && (
+          destination && (
             <MapViewDirections 
-              origin={origin}
+              origin={pickUp ? pickUp : origin}
               destination={destination}
               apikey={GOOGLE_API_KEY}
               strokeWidth={4}
@@ -338,6 +344,7 @@ export default function HomeScreen() {
       <ButtomSheet
         userToken={userToken}
         origin={origin}
+        pickUp={pickUp}
         destination={destination}
         orderToken={orderToken}
         orderType={orderType}
