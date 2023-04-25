@@ -6,11 +6,11 @@ export default function DriverMarker({ driver }) {
     <Marker
       identifier={driver.id}
       coordinate={{
-        latitude: driver.data.location.latitude,
-        longitude: driver.data.location.longitude,
+        latitude: driver.location.latitude,
+        longitude: driver.location.longitude,
       }}
       anchor={{ x: 0.5, y: 0.5 }}
-      image={require('../assets/car.png')}
+      image={driver.available ? require('../assets/car.png') : require('../assets/InactiveCar.png')}
     />
   )
 }

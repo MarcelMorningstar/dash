@@ -108,7 +108,7 @@ export default function HomeScreen() {
   })
 
   useEffect(() => {
-    const q = query(collection(firestore, "drivers"), where("active", "==", true), where("available", "==", true));
+    const q = query(collection(firestore, "drivers"), where("active", "==", true));
 
     const driverUnsubscribe = onSnapshot(q, (querySnapshot) => {
       const temp = [];
@@ -117,7 +117,7 @@ export default function HomeScreen() {
         if (distance(origin.latitude, doc.data().location.latitude, origin.longitude, doc.data().location.longitude) < 12) {
           temp.push({
             id: doc.id,
-            data: doc.data()
+            ...doc.data()
           });
         }
       })
