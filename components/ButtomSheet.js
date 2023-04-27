@@ -1,6 +1,6 @@
 import React, { useCallback, useRef, useMemo, useEffect, useState } from "react";
 import { Animated, Appearance, Image, Keyboard, ScrollView, StyleSheet, TouchableHighlight, TouchableOpacity, View } from "react-native";
-import { Text, PrimaryTouchableHighlight, FontAwesome5 } from "./Themed";
+import { Text, PrimaryTouchableHighlight, SecondaryTouchableOpacity, FontAwesome5, Feather } from "./Themed";
 import { Ionicons } from '@expo/vector-icons'; 
 import { BottomSheetModal, BottomSheetModalProvider } from "@gorhom/bottom-sheet";
 import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete'
@@ -12,12 +12,14 @@ import { setDestination, setPickUp } from "../slices/mainSlice";
 import { setOrderToken, setOrderInformation, setOrderType } from "../slices/orderSlice";
 import { selectTheme } from '../slices/authSlice'
 
+import { callNumber } from "../utils/phone";
+
 import { collection, addDoc } from "firebase/firestore";
 import { firestore } from "../firebase";
 
 import { GOOGLE_API_KEY } from '@env'
 
-const ButtomSheet = ({ userToken, origin, pickUp, destination, orderToken, orderType, orderInformation, status, setStatus, cancelOrder, directionsView, setDirectionsView, fitDerection, fitUser }) => {
+const ButtomSheet = ({ userToken, origin, pickUp, destination, orderToken, orderType, orderInformation, driver, status, setStatus, cancelOrder, directionsView, setDirectionsView, fitDerection, fitUser }) => {
   const dispatch = useDispatch()
   const [fromAddress, setFromAddress] = useState('')
   const [destinationAddress, setDestinationAddress] = useState('')
@@ -210,8 +212,6 @@ const ButtomSheet = ({ userToken, origin, pickUp, destination, orderToken, order
       status: 'in wait',
     });
 
-    console.log(docRef.id)
-
     dispatch(setOrderToken(docRef.id))
     dispatch(setOrderInformation({
       status: 'in wait',
@@ -272,20 +272,44 @@ const ButtomSheet = ({ userToken, origin, pickUp, destination, orderToken, order
                         <View style={{ width: '100%', alignItems: 'center' }}>
                           <Text style={{ fontSize: 15 }}>Car will arrive in 5 min</Text>
                           
-                          <View style={{ flexDirection: 'row', width: '100%', marginTop: 8 }}>
-                            <View style={{ width: 48, height: 48, marginRight: 12, backgroundColor: 'gray', borderRadius: 24 }}></View>
-                            <View style={{ flexDirection: 'column', justifyContent: 'center' }}>
-                              <Text style={{ fontSize: 15 }}>Mercedes i8</Text>
-                              <Text>LV-0000</Text>
+                          <View style={[styles.row, { width: '100%', alignItems: 'center', justifyContent: 'space-between', marginTop: 8 }]}>
+                            <View style={styles.row}>
+                              <View style={{ width: 48, height: 48, marginRight: 12, backgroundColor: 'gray', borderRadius: 24 }}></View>
+                              <View style={{ flexDirection: 'column', justifyContent: 'center' }}>
+                                <Text style={{ fontSize: 15 }}>{ driver.displayName }</Text>
+                              </View>
+                            </View>
+
+                            <View style={[styles.row]}>
+                              <View style={{ alignItems: 'flex-end', marginRight: 12 }}>
+                                <Text style={{ fontSize: 15 }}>Mercedes i8</Text>
+                                <Text>LV-0000</Text>
+                              </View>
+                              <SecondaryTouchableOpacity style={{ alignItems: 'center', justifyContent: 'center', width: 48, height: 48, borderRadius: 24, }} onPress={() => callNumber('+37126521385')}>
+                                <Feather name="phone" size={28} />
+                              </SecondaryTouchableOpacity>
                             </View>
                           </View>
                         </View>
                       ) : status === 'arrived' && (
                         <View style={{ flexDirection: 'row', width: '100%', marginTop: 8 }}>
-                          <View style={{ width: 48, height: 48, marginRight: 12, backgroundColor: 'gray', borderRadius: 24 }}></View>
-                          <View style={{ flexDirection: 'column', justifyContent: 'center' }}>
-                            <Text style={{ fontSize: 15 }}>Mercedes Sprinter</Text>
-                            <Text>LV-0000</Text>
+                          <View style={[styles.row, { width: '100%', alignItems: 'center', justifyContent: 'space-between', marginTop: 8 }]}>
+                            <View style={styles.row}>
+                              <View style={{ width: 48, height: 48, marginRight: 12, backgroundColor: 'gray', borderRadius: 24 }}></View>
+                              <View style={{ flexDirection: 'column', justifyContent: 'center' }}>
+                                <Text style={{ fontSize: 15 }}>Lohs 2000</Text>
+                              </View>
+                            </View>
+
+                            <View style={[styles.row]}>
+                              <View style={{ alignItems: 'flex-end', marginRight: 12 }}>
+                                <Text style={{ fontSize: 15 }}>Mercedes i8</Text>
+                                <Text>LV-0000</Text>
+                              </View>
+                              <SecondaryTouchableOpacity style={{ alignItems: 'center', justifyContent: 'center', width: 48, height: 48, borderRadius: 24, }} onPress={() => {}}>
+                                <Feather name="phone" size={28} />
+                              </SecondaryTouchableOpacity>
+                            </View>
                           </View>
                         </View>
                       )

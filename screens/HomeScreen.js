@@ -19,9 +19,9 @@ import Colors from '../constants/Colors'
 import { useSelector, useDispatch } from 'react-redux'
 import { selectDestination, selectOrigin, selectPickUp, setDestination, setOrigin, setPickUp } from '../slices/mainSlice'
 import { selectUserInfo, selectUserToken, selectTheme } from '../slices/authSlice'
-import { selectOrderInformation, selectOrderToken, selectOrderType, setOrderInformation, setOrderToken, setOrderType } from '../slices/orderSlice'
+import { selectCar, selectDriver, selectOrderInformation, selectOrderToken, selectOrderType, setCar, setDriver, setOrderInformation, setOrderToken, setOrderType } from '../slices/orderSlice'
 
-import { collection, query, where, onSnapshot, doc, updateDoc } from "firebase/firestore";
+import { collection, query, where, onSnapshot, doc, updateDoc, getDoc } from "firebase/firestore";
 import { ref, set } from "firebase/database"
 import { firestore, database } from '../firebase'
 
@@ -47,15 +47,12 @@ export default function HomeScreen() {
   const orderToken = useSelector(selectOrderToken)
   const orderType = useSelector(selectOrderType)
   const orderInformation = useSelector(selectOrderInformation)
+  const driver = useSelector(selectDriver)
+  const car = useSelector(selectCar)
 
   const [directionsView, setDirectionsView] = useState(false)
   const [drivers, setDrivers] = useState([])
   const [status, setStatus] = useState('done')
-
-  useEffect(() => {
-    console.log(pickUp)
-  }, [pickUp])
-  
 
   const styles = StyleSheet.create({
     inputContainer: {
@@ -136,9 +133,20 @@ export default function HomeScreen() {
         const orderUpdates = onSnapshot(doc(firestore, "calls", orderToken), (snapshot) => {
           let data = snapshot.data()
   
-          console.log(data)
-  
           setStatus(data.status)
+
+          if (data.driver) {
+            const trackDriver = onSnapshot(doc(firestore, "drivers", data.driver), (doc) => {
+              dispatch(setDriver(doc.data()))
+            });
+
+            (async () => {
+              const docSnap = await getDoc(doc(firestore, "cars", driver.car))
+
+              dispatch(setCar(docSnap.data()))
+            })()
+          }
+
           dispatch(setOrderInformation({
             status: data.status
           }))
@@ -157,9 +165,12 @@ export default function HomeScreen() {
         userLoactionUpdateInterval.current = null
 
         dispatch(setDestination(null))
+        dispatch(setPickUp(null))
         dispatch(setOrderToken(null))
         dispatch(setOrderType('taxi'))
         dispatch(setOrderInformation(null))
+        dispatch(setDriver(null))
+        dispatch(setCar(null))
 
         setDirectionsView(false)
       }
@@ -196,7 +207,7 @@ export default function HomeScreen() {
 
     setStatus('done')
 
-    dispatch(setPickUp(null))
+    fitUser()
   }
 
   TaskManager.defineTask(BACKGROUND_FETCH_TASK, () => {
@@ -324,6 +335,20 @@ export default function HomeScreen() {
         }
 
         {
+          driver && (
+            <Marker
+              identifier='driver'
+              coordinate={{
+                latitude: driver.location.latitude,
+                longitude: driver.location.longitude,
+              }}
+              anchor={{ x: 0.5, y: 0.5 }}
+              image={require('../assets/car.png')}
+            />
+          )
+        }
+
+        {
           destination && (
             <Marker 
               identifier='origin'
@@ -368,6 +393,8 @@ export default function HomeScreen() {
         orderToken={orderToken}
         orderType={orderType}
         orderInformation={orderInformation}
+        driver={driver}
+        car={car}
         status={status}
         setStatus={setStatus}
         cancelOrder={cancelOrder}
