@@ -1,6 +1,6 @@
 import React, { useCallback, useRef, useMemo, useEffect, useState } from "react";
 import { Animated, Appearance, Image, Keyboard, ScrollView, StyleSheet, TouchableHighlight, TouchableOpacity, View } from "react-native";
-import { Text, PrimaryTouchableHighlight, FontAwesome5 } from "./Themed";
+import { Text, PrimaryTouchableHighlight, SecondaryTouchableOpacity, FontAwesome5, Feather } from "./Themed";
 import { Ionicons } from '@expo/vector-icons'; 
 import { BottomSheetModal, BottomSheetModalProvider } from "@gorhom/bottom-sheet";
 import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete'
@@ -8,16 +8,18 @@ import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplet
 import Colors from "../constants/Colors";
 
 import { useSelector, useDispatch } from 'react-redux'
-import { setDestination } from "../slices/mainSlice";
+import { setDestination, setPickUp } from "../slices/mainSlice";
 import { setOrderToken, setOrderInformation, setOrderType } from "../slices/orderSlice";
 import { selectTheme } from '../slices/authSlice'
+
+import { callNumber } from "../utils/phone";
 
 import { collection, addDoc } from "firebase/firestore";
 import { firestore } from "../firebase";
 
 import { GOOGLE_API_KEY } from '@env'
 
-const ButtomSheet = ({ userToken, origin, destination, orderToken, orderType, orderInformation, status, setStatus, cancelOrder, directionsView, setDirectionsView, fitDerection, fitUser }) => {
+const ButtomSheet = ({ userToken, origin, pickUp, destination, orderToken, orderType, orderInformation, driver, status, setStatus, cancelOrder, directionsView, setDirectionsView, fitDerection, fitUser }) => {
   const dispatch = useDispatch()
   const [fromAddress, setFromAddress] = useState('')
   const [destinationAddress, setDestinationAddress] = useState('')
@@ -45,7 +47,7 @@ const ButtomSheet = ({ userToken, origin, destination, orderToken, orderType, or
   })
 
   const bottomSheetModalRef = useRef(null);
-  const snapPoints = useMemo(() => [24, 107, 220, 360], []);
+  const snapPoints = useMemo(() => [24, 107, 228, 360], []);
 
   const handlePresentModalPress = useCallback(() => {
     bottomSheetModalRef.current?.present();
@@ -179,14 +181,26 @@ const ButtomSheet = ({ userToken, origin, destination, orderToken, orderType, or
 
   const createCall = async () => {
     let travelInformation = await travelInfo()
-    let from = await addressFrom()
+    let fromLatitude
+    let fromLongitude
+    let fromAddress
+
+    if (pickUp) {
+      fromLatitude = pickUp.latitude
+      fromLongitude = pickUp.longitude
+      fromAddress = pickUp.address
+    } else {
+      fromLatitude = origin.latitude
+      fromLongitude = origin.longitude
+      fromAddress = await addressFrom()
+    }
 
     const docRef = await addDoc(collection(firestore, "calls"), {
       created_at: new Date(),
       pick_up: {
-        latitude: origin.latitude,
-        longitude: origin.longitude,
-        address: from
+        latitude: fromLatitude,
+        longitude: fromLongitude,
+        address: fromAddress
       },
       destination: destination,
       travelInformation: {
@@ -198,15 +212,13 @@ const ButtomSheet = ({ userToken, origin, destination, orderToken, orderType, or
       status: 'in wait',
     });
 
-    console.log(docRef.id)
-
     dispatch(setOrderToken(docRef.id))
     dispatch(setOrderInformation({
       status: 'in wait',
       pick_up: {
-        latitude: origin.latitude,
-        longitude: origin.longitude,
-        address: from
+        latitude: fromLatitude,
+        longitude: fromLongitude,
+        address: fromAddress
       },
       destination: destination,
       travelInformation: {
@@ -231,16 +243,21 @@ const ButtomSheet = ({ userToken, origin, destination, orderToken, orderType, or
           <View style={styles.contentConainer}>
             {
               !!orderToken ? (
-                <View style={[styles.container, { height: 175 }]}>
+                <View style={[styles.container, { height: 183 }]}>
                   <View style={{ flexDirection: 'column', alignItems: 'center' }}>
                     {
-                      status === 'in wait' || status === 'waiting driver' ? (
+                      status === 'in wait' ? (
                         <View onLayout={waitStatus} style={{ flexDirection: 'row', marginBottom: 4 }}>
                           <Animated.View style={{ width: 21, height: 21, marginHorizontal: 2, borderRadius: 11, backgroundColor: 'gray', opacity: circleOpacity2, transform: [{scale: circleScale2}] }}></Animated.View>
                           <Animated.View style={{ width: 21, height: 21, marginHorizontal: 2, borderRadius: 11, backgroundColor: 'gray', opacity: circleOpacity1, transform: [{scale: circleScale1}] }}></Animated.View>
                           <Animated.View style={{ width: 21, height: 21, marginHorizontal: 2, borderRadius: 11, backgroundColor: 'gray', opacity: circleOpacity2, transform: [{scale: circleScale2}] }}></Animated.View>
                         </View>
-                      ) : status === 'arrived' && (
+                      ) : status === 'waiting driver' ? (
+                        <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4, paddingVertical: 4, paddingLeft: 4, paddingRight: 16, backgroundColor: 'lightgray', borderRadius: 24 }}>
+                          <Ionicons name="checkmark-circle" size={28} color="green" style={{ marginRight: 5 }} />
+                          <Text style={{ fontSize: 14, fontWeight: '500' }}>Accepted</Text>
+                        </View>
+                      ): status === 'arrived' && (
                         <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4, paddingVertical: 4, paddingLeft: 4, paddingRight: 16, backgroundColor: 'lightgray', borderRadius: 24 }}>
                           <Ionicons name="checkmark-circle" size={28} color="green" style={{ marginRight: 5 }} />
                           <Text style={{ fontSize: 14, fontWeight: '500' }}>Arrived</Text>
@@ -255,20 +272,44 @@ const ButtomSheet = ({ userToken, origin, destination, orderToken, orderType, or
                         <View style={{ width: '100%', alignItems: 'center' }}>
                           <Text style={{ fontSize: 15 }}>Car will arrive in 5 min</Text>
                           
-                          <View style={{ flexDirection: 'row', width: '100%', marginTop: 8 }}>
-                            <View style={{ width: 48, height: 48, marginRight: 12, backgroundColor: 'gray', borderRadius: 24 }}></View>
-                            <View style={{ flexDirection: 'column', justifyContent: 'center' }}>
-                              <Text style={{ fontSize: 15 }}>Mercedes i8</Text>
-                              <Text>LV-0000</Text>
+                          <View style={[styles.row, { width: '100%', alignItems: 'center', justifyContent: 'space-between', marginTop: 8 }]}>
+                            <View style={styles.row}>
+                              <View style={{ width: 48, height: 48, marginRight: 12, backgroundColor: 'gray', borderRadius: 24 }}></View>
+                              <View style={{ flexDirection: 'column', justifyContent: 'center' }}>
+                                <Text style={{ fontSize: 15 }}>{ driver.displayName }</Text>
+                              </View>
+                            </View>
+
+                            <View style={[styles.row]}>
+                              <View style={{ alignItems: 'flex-end', marginRight: 12 }}>
+                                <Text style={{ fontSize: 15 }}>Mercedes i8</Text>
+                                <Text>LV-0000</Text>
+                              </View>
+                              <SecondaryTouchableOpacity style={{ alignItems: 'center', justifyContent: 'center', width: 48, height: 48, borderRadius: 24, }} onPress={() => callNumber('+37126521385')}>
+                                <Feather name="phone" size={28} />
+                              </SecondaryTouchableOpacity>
                             </View>
                           </View>
                         </View>
                       ) : status === 'arrived' && (
                         <View style={{ flexDirection: 'row', width: '100%', marginTop: 8 }}>
-                          <View style={{ width: 48, height: 48, marginRight: 12, backgroundColor: 'gray', borderRadius: 24 }}></View>
-                          <View style={{ flexDirection: 'column', justifyContent: 'center' }}>
-                            <Text style={{ fontSize: 15 }}>Mercedes Sprinter</Text>
-                            <Text>LV-0000</Text>
+                          <View style={[styles.row, { width: '100%', alignItems: 'center', justifyContent: 'space-between', marginTop: 8 }]}>
+                            <View style={styles.row}>
+                              <View style={{ width: 48, height: 48, marginRight: 12, backgroundColor: 'gray', borderRadius: 24 }}></View>
+                              <View style={{ flexDirection: 'column', justifyContent: 'center' }}>
+                                <Text style={{ fontSize: 15 }}>Lohs 2000</Text>
+                              </View>
+                            </View>
+
+                            <View style={[styles.row]}>
+                              <View style={{ alignItems: 'flex-end', marginRight: 12 }}>
+                                <Text style={{ fontSize: 15 }}>Mercedes i8</Text>
+                                <Text>LV-0000</Text>
+                              </View>
+                              <SecondaryTouchableOpacity style={{ alignItems: 'center', justifyContent: 'center', width: 48, height: 48, borderRadius: 24, }} onPress={() => {}}>
+                                <Feather name="phone" size={28} />
+                              </SecondaryTouchableOpacity>
+                            </View>
                           </View>
                         </View>
                       )
@@ -326,6 +367,7 @@ const ButtomSheet = ({ userToken, origin, destination, orderToken, orderType, or
                       style={[{ width: '32%', backgroundColor: '#555555' }, styles.button]}
                       onPress={() => {
                         dispatch(setDestination(null))
+                        dispatch(setPickUp(null))
 
                         setDirectionsView(false)
 
@@ -345,7 +387,7 @@ const ButtomSheet = ({ userToken, origin, destination, orderToken, orderType, or
                       <Image
                         source={require("../assets/taxi.png")}
                         style={{
-                          width: '69%',
+                          height: '111%',
                           resizeMode: 'contain'
                         }}
                       />
@@ -354,25 +396,7 @@ const ButtomSheet = ({ userToken, origin, destination, orderToken, orderType, or
                       <Image
                         source={require("../assets/driver.png")}
                         style={{
-                          width: '52%',
-                          resizeMode: 'contain'
-                        }}
-                      />
-                    </TouchableOpacity>
-                    <TouchableOpacity style={[styles.type, orderType === 'package' ? { backgroundColor: 'gray' } : { backgroundColor: 'lightgray' } ]} onPress={() => { dispatch(setOrderType('package')); handleSnapPress(3) }}>
-                      <Image
-                        source={require("../assets/package.png")}
-                        style={{
-                          width: '52%',
-                          resizeMode: 'contain'
-                        }}
-                      />
-                    </TouchableOpacity>
-                    <TouchableOpacity style={[styles.type, orderType === 'tow-truck' ? { backgroundColor: 'gray' } : { backgroundColor: 'lightgray' } ]} onPress={() => { dispatch(setOrderType('tow-truck')); handleSnapPress(3) }}>
-                      <Image
-                        source={require("../assets/tow-truck.png")}
-                        style={{
-                          width: '70%',
+                          height: '75%',
                           resizeMode: 'contain'
                         }}
                       />
@@ -392,7 +416,15 @@ const ButtomSheet = ({ userToken, origin, destination, orderToken, orderType, or
                       // currentLocation={true}
                       onChangeText={setFromAddress}
                       value={fromAddress}
-                      onPress={() => {}}
+                      onPress={(data, details = null) => {
+                        Keyboard.dismiss()
+
+                        dispatch(setPickUp({
+                          latitude: details.geometry.location.lat,
+                          longitude: details.geometry.location.lng,
+                          address: details.formatted_address
+                        }))
+                      }}
                       minLength={2}
                       styles={{
                         container: {
@@ -502,7 +534,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row'
   },
   type: {
-    width: '24%', 
+    width: '49%', 
     height: 64, 
     alignItems: 'center', 
     justifyContent: 'center',

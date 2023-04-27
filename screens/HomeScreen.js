@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react'
-import { Appearance, PixelRatio, Platform, StyleSheet, View } from 'react-native'
+import { Appearance, Image, PixelRatio, Platform, StyleSheet, View } from 'react-native'
 import { TouchableHighlight } from '../components/Themed'
 import * as BackgroundFetch from 'expo-background-fetch'
 import * as TaskManager from 'expo-task-manager'
@@ -17,11 +17,11 @@ import FirstTimeForm from '../components/FirstTimeForm'
 import Colors from '../constants/Colors'
 
 import { useSelector, useDispatch } from 'react-redux'
-import { selectDestination, selectOrigin, setDestination, setOrigin } from '../slices/mainSlice'
+import { selectDestination, selectOrigin, selectPickUp, setDestination, setOrigin, setPickUp } from '../slices/mainSlice'
 import { selectUserInfo, selectUserToken, selectTheme } from '../slices/authSlice'
-import { selectOrderInformation, selectOrderToken, selectOrderType, setOrderInformation, setOrderToken, setOrderType } from '../slices/orderSlice'
+import { selectCar, selectDriver, selectOrderInformation, selectOrderToken, selectOrderType, setCar, setDriver, setOrderInformation, setOrderToken, setOrderType } from '../slices/orderSlice'
 
-import { collection, query, where, onSnapshot, doc, updateDoc } from "firebase/firestore";
+import { collection, query, where, onSnapshot, doc, updateDoc, getDoc } from "firebase/firestore";
 import { ref, set } from "firebase/database"
 import { firestore, database } from '../firebase'
 
@@ -40,12 +40,15 @@ export default function HomeScreen() {
 
   const dispatch = useDispatch()
   const origin = useSelector(selectOrigin)
+  const pickUp = useSelector(selectPickUp)
   const destination = useSelector(selectDestination)
   const userToken = useSelector(selectUserToken)
   const userInfo = useSelector(selectUserInfo)
   const orderToken = useSelector(selectOrderToken)
   const orderType = useSelector(selectOrderType)
   const orderInformation = useSelector(selectOrderInformation)
+  const driver = useSelector(selectDriver)
+  const car = useSelector(selectCar)
 
   const [directionsView, setDirectionsView] = useState(false)
   const [drivers, setDrivers] = useState([])
@@ -102,7 +105,7 @@ export default function HomeScreen() {
   })
 
   useEffect(() => {
-    const q = query(collection(firestore, "drivers"), where("active", "==", true), where("available", "==", true));
+    const q = query(collection(firestore, "drivers"), where("active", "==", true));
 
     const driverUnsubscribe = onSnapshot(q, (querySnapshot) => {
       const temp = [];
@@ -111,7 +114,7 @@ export default function HomeScreen() {
         if (distance(origin.latitude, doc.data().location.latitude, origin.longitude, doc.data().location.longitude) < 12) {
           temp.push({
             id: doc.id,
-            data: doc.data()
+            ...doc.data()
           });
         }
       })
@@ -130,9 +133,20 @@ export default function HomeScreen() {
         const orderUpdates = onSnapshot(doc(firestore, "calls", orderToken), (snapshot) => {
           let data = snapshot.data()
   
-          console.log(data)
-  
           setStatus(data.status)
+
+          if (data.driver) {
+            const trackDriver = onSnapshot(doc(firestore, "drivers", data.driver), (doc) => {
+              dispatch(setDriver(doc.data()))
+            });
+
+            (async () => {
+              const docSnap = await getDoc(doc(firestore, "cars", driver.car))
+
+              dispatch(setCar(docSnap.data()))
+            })()
+          }
+
           dispatch(setOrderInformation({
             status: data.status
           }))
@@ -151,9 +165,12 @@ export default function HomeScreen() {
         userLoactionUpdateInterval.current = null
 
         dispatch(setDestination(null))
+        dispatch(setPickUp(null))
         dispatch(setOrderToken(null))
         dispatch(setOrderType('taxi'))
         dispatch(setOrderInformation(null))
+        dispatch(setDriver(null))
+        dispatch(setCar(null))
 
         setDirectionsView(false)
       }
@@ -189,6 +206,8 @@ export default function HomeScreen() {
     })
 
     setStatus('done')
+
+    fitUser()
   }
 
   TaskManager.defineTask(BACKGROUND_FETCH_TASK, () => {
@@ -286,6 +305,23 @@ export default function HomeScreen() {
           </TouchableHighlight>
         )
       }
+
+      {
+        status === 'arrived' && (
+          <Image 
+            source={require("../assets/confetti.gif")}
+            style={{
+              position: 'absolute',
+              zIndex: 9999,
+              top: -60,
+              transform: [{rotate: '180deg'}],
+              height: '60%',
+              width: '100%',
+              resizeMode: 'contain'
+            }}
+          />
+        )
+      }
       
       <Map mapRef={mapRef} origin={origin} directionsView={directionsView} userLocationChange={userLocationChange} insets={insets}>
         {
@@ -299,19 +335,33 @@ export default function HomeScreen() {
         }
 
         {
-          origin && destination && (
+          driver && (
+            <Marker
+              identifier='driver'
+              coordinate={{
+                latitude: driver.location.latitude,
+                longitude: driver.location.longitude,
+              }}
+              anchor={{ x: 0.5, y: 0.5 }}
+              image={require('../assets/car.png')}
+            />
+          )
+        }
+
+        {
+          destination && (
             <Marker 
               identifier='origin'
               coordinate={{
-                latitude: origin.latitude,
-                longitude: origin.longitude,
+                latitude: pickUp ? pickUp.latitude : origin.latitude,
+                longitude: pickUp ? pickUp.longitude : origin.longitude,
               }}
             />
           )
         }
 
         {
-          origin && destination && (
+          destination && (
             <Marker 
               identifier='destination'
               coordinate={{
@@ -323,9 +373,9 @@ export default function HomeScreen() {
         }
 
         {
-          origin && destination && (
+          destination && (
             <MapViewDirections 
-              origin={origin}
+              origin={pickUp ? pickUp : origin}
               destination={destination}
               apikey={GOOGLE_API_KEY}
               strokeWidth={4}
@@ -338,10 +388,13 @@ export default function HomeScreen() {
       <ButtomSheet
         userToken={userToken}
         origin={origin}
+        pickUp={pickUp}
         destination={destination}
         orderToken={orderToken}
         orderType={orderType}
         orderInformation={orderInformation}
+        driver={driver}
+        car={car}
         status={status}
         setStatus={setStatus}
         cancelOrder={cancelOrder}
