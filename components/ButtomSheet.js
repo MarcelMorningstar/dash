@@ -1,6 +1,6 @@
 import React, { useCallback, useRef, useMemo, useEffect, useState } from "react";
 import { Animated, Appearance, Image, Keyboard, ScrollView, StyleSheet, TouchableHighlight, TouchableOpacity, View } from "react-native";
-import { Text, PrimaryTouchableHighlight, SecondaryTouchableOpacity, FontAwesome5, Feather, SecondaryView } from "./Themed";
+import { Text, PrimaryTouchableHighlight, SecondaryTouchableOpacity, FontAwesome5, Feather, Fontisto, SecondaryView } from "./Themed";
 import { Ionicons } from '@expo/vector-icons'; 
 import { BottomSheetModal, BottomSheetModalProvider } from "@gorhom/bottom-sheet";
 import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete'
@@ -23,7 +23,7 @@ import { firestore } from "../firebase";
 
 import { GOOGLE_API_KEY } from '@env'
 
-const ButtomSheet = ({ userToken, origin, pickUp, destination, orderToken, orderType, orderInformation, driver, car, status, setStatus, cancelOrder, directionsView, setDirectionsView, fitDerection, fitUser }) => {
+const ButtomSheet = ({ userToken, origin, pickUp, destination, orderToken, orderType, orderInformation, drivers, driver, car, status, setStatus, cancelOrder, directionsView, setDirectionsView, fitDerection, fitUser }) => {
   const dispatch = useDispatch()
   const [fromAddress, setFromAddress] = useState('')
   const [destinationAddress, setDestinationAddress] = useState('')
@@ -234,10 +234,22 @@ const ButtomSheet = ({ userToken, origin, pickUp, destination, orderToken, order
                   <View style={{ flexDirection: 'column', alignItems: 'center' }}>
                     {
                       status === 'in wait' ? (
-                        <View onLayout={waitStatus} style={{ flexDirection: 'row', marginBottom: 4 }}>
-                          <Animated.View style={{ width: 21, height: 21, marginHorizontal: 2, borderRadius: 11, backgroundColor: 'gray', opacity: circleOpacity2, transform: [{scale: circleScale2}] }}></Animated.View>
-                          <Animated.View style={{ width: 21, height: 21, marginHorizontal: 2, borderRadius: 11, backgroundColor: 'gray', opacity: circleOpacity1, transform: [{scale: circleScale1}] }}></Animated.View>
-                          <Animated.View style={{ width: 21, height: 21, marginHorizontal: 2, borderRadius: 11, backgroundColor: 'gray', opacity: circleOpacity2, transform: [{scale: circleScale2}] }}></Animated.View>
+                        <View style={{ width: '100%' }}>
+                          <View onLayout={waitStatus} style={{ flexDirection: 'row', justifyContent: 'center', marginBottom: 4 }}>
+                            <Animated.View style={{ width: 21, height: 21, marginHorizontal: 2, borderRadius: 11, backgroundColor: 'gray', opacity: circleOpacity2, transform: [{scale: circleScale2}] }}></Animated.View>
+                            <Animated.View style={{ width: 21, height: 21, marginHorizontal: 2, borderRadius: 11, backgroundColor: 'gray', opacity: circleOpacity1, transform: [{scale: circleScale1}] }}></Animated.View>
+                            <Animated.View style={{ width: 21, height: 21, marginHorizontal: 2, borderRadius: 11, backgroundColor: 'gray', opacity: circleOpacity2, transform: [{scale: circleScale2}] }}></Animated.View>
+                          </View>
+
+                          <Text style={{ fontSize: 15, textAlign: 'center' }}>Waiting for a response from a driver</Text>
+
+                          <View style={{ flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center', marginTop: 24 }}>
+                            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                              <Fontisto name="taxi" size={32} style={{ marginRight: 12 }} />
+                              <Text style={{ fontSize: 18, fontWeight: '500' }}>{ drivers.length }</Text>
+                            </View>
+                            <Text style={{ fontSize: 21, fontWeight: '500' }}></Text>
+                          </View>
                         </View>
                       ) : status === 'waiting driver' && driver ? (
                         <View style={{ width: '100%' }}>
@@ -259,9 +271,7 @@ const ButtomSheet = ({ userToken, origin, pickUp, destination, orderToken, order
                     }
                     
                     {
-                      status === 'in wait' ? (
-                        <Text style={{ fontSize: 15 }}>Waiting for a response from a driver</Text>
-                      ) : (status === 'waiting driver' || status === 'arrived') && ( 
+                      (status === 'waiting driver' || status === 'arrived') && ( 
                         driver && car && (
                           <View style={[styles.row, { width: '100%', alignItems: 'center', justifyContent: 'space-between', marginTop: 8 }]}>
                             <View style={styles.row}>

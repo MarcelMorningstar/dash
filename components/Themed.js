@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { Appearance, Text as DefaultText, TextInput as DefaultTextInput, View as DefaultView, SafeAreaView as DefaultSafeAreaView, TouchableHighlight as DefaultTouchableHighlight, TouchableOpacity as DefaultTouchableOpacity, StatusBar as DefaultStatusBar } from 'react-native'
 import { DarkTheme, DefaultTheme, NavigationContainer as DefaultNavigationContainer } from '@react-navigation/native'
 import { Divider as DefaultDivider } from './Divider'
-import { Octicons as DefaultOcticons, AntDesign as DefaultAntDesing, MaterialIcons as DefaultMaterialIcons, MaterialCommunityIcons as DefaultMaterialCommunityIcons, Feather as DefaultFeather, FontAwesome as DefaultFontAwesome, FontAwesome5 as DefaultFontAwesome5, Ionicons as DefaultIonicons } from '@expo/vector-icons'
+import { Fontisto as DefaultFontisto, Octicons as DefaultOcticons, AntDesign as DefaultAntDesing, MaterialIcons as DefaultMaterialIcons, MaterialCommunityIcons as DefaultMaterialCommunityIcons, Feather as DefaultFeather, FontAwesome as DefaultFontAwesome, FontAwesome5 as DefaultFontAwesome5, Ionicons as DefaultIonicons } from '@expo/vector-icons'
 import Colors from '../constants/Colors'
 
 import { useSelector } from 'react-redux'
@@ -175,6 +175,13 @@ export function AntDesign(props) {
   const color = useThemeColor('text')
 
   return <DefaultAntDesing color={ color } {...otherProps} />;
+}
+
+export function Fontisto(props) {
+  const { ...otherProps } = props;
+  const color = useThemeColor('text')
+
+  return <DefaultFontisto color={ color } {...otherProps} />;
 }
 
 export function Octicons(props) {

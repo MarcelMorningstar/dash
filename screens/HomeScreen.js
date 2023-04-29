@@ -4,7 +4,7 @@ import { TouchableHighlight } from '../components/Themed'
 import * as BackgroundFetch from 'expo-background-fetch'
 import * as TaskManager from 'expo-task-manager'
 import * as Location from 'expo-location'
-import { FontAwesome5, MaterialIcons } from '@expo/vector-icons'
+import { FontAwesome5, Fontisto, MaterialIcons } from '@expo/vector-icons'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { Marker } from 'react-native-maps'
 import MapViewDirections from 'react-native-maps-directions'
@@ -114,7 +114,7 @@ export default function HomeScreen() {
       const temp = [];
 
       querySnapshot.forEach((doc) => {
-        if (getDistance(origin.latitude, doc.data().location.latitude, origin.longitude, doc.data().location.longitude) < 12) {
+        if (getDistance(origin.latitude, doc.data().location.latitude, origin.longitude, doc.data().location.longitude) < 10) {
           temp.push({
             id: doc.id,
             ...doc.data()
@@ -263,6 +263,17 @@ export default function HomeScreen() {
     }, 1)
   }
 
+  const fitDriver = () => {
+    setTimeout(() => { 
+      mapRef.current.animateToRegion({ 
+        latitude: driver?.location?.latitude, 
+        longitude: driver?.location?.longitude, 
+        latitudeDelta: 0.018,
+        longitudeDelta: 0.012,
+      }, 1000)
+    }, 1)
+  }
+
   const fitDerection = (delay) => {
     setTimeout(() => {
       mapRef.current.fitToSuppliedMarkers(['origin', 'destination'], {
@@ -278,6 +289,18 @@ export default function HomeScreen() {
   
   return (
     <View behavior={Platform.OS === "ios" ? "padding" : "height"} style={{ flex: 1 }}>
+      {
+        (driver && orderToken && (status === 'waiting driver' || status === 'arrived')) && (
+          <TouchableHighlight
+            activeOpacity={0.6}
+            style={[styles.centerBtn, { right: 76, }]}
+            onPress={fitDriver}
+          >
+            <Fontisto name="taxi" size={21} color="black" />
+          </TouchableHighlight>
+        )
+      }
+
       {
         !destination ? (
           <TouchableHighlight
@@ -316,9 +339,9 @@ export default function HomeScreen() {
       <Map mapRef={mapRef} origin={origin} directionsView={directionsView} userLocationChange={userLocationChange} insets={insets}>
         {
           !directionsView && (
-            drivers.map(driver => {
+            drivers.map(item => {
               return (
-                <DriverMarker key={driver.id} driver={driver} userInfo={userInfo} />
+                <DriverMarker key={item.id} driver={item} userInfo={userInfo} />
               )
             })
           )
@@ -383,6 +406,7 @@ export default function HomeScreen() {
         orderToken={orderToken}
         orderType={orderType}
         orderInformation={orderInformation}
+        drivers={drivers}
         driver={driver}
         car={car}
         status={status}
