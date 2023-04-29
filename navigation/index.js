@@ -25,8 +25,9 @@ import { selectUserToken, setTheme, setUserInfo, setUserToken } from '../slices/
 import { setOrigin } from '../slices/mainSlice';
 
 import { onAuthStateChanged } from 'firebase/auth';
-import { doc, getDoc } from "firebase/firestore";
+import { collection, doc, getDoc, getDocs, query, where } from "firebase/firestore";
 import { auth, firestore } from '../firebase';
+import { setOrderInformation, setOrderToken } from "../slices/orderSlice";
 
 const theme = Appearance.getColorScheme()
 
@@ -81,6 +82,20 @@ function RootNavigator() {
           } else {
             dispatch(setUserInfo(null))
           }
+
+          const q = query(collection(firestore, "calls"), where('user', '==', user.uid));
+          const querySnapshot = await getDocs(q);
+
+          querySnapshot.forEach((doc) => {
+            let data = doc.data()
+
+            if (data.status != 'done' && data.status != 'canceled') {
+              dispatch(setOrderToken(doc.id))
+              dispatch(setOrderInformation({
+                status: data.status
+              }))
+            }
+          });
 
           try {
             const value = await AsyncStorage.getItem('theme')

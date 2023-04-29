@@ -21,13 +21,15 @@ import { selectDestination, selectOrigin, selectPickUp, setDestination, setOrigi
 import { selectUserInfo, selectUserToken, selectTheme } from '../slices/authSlice'
 import { selectCar, selectDriver, selectOrderInformation, selectOrderToken, selectOrderType, setCar, setDriver, setOrderInformation, setOrderToken, setOrderType } from '../slices/orderSlice'
 
-import { collection, query, where, onSnapshot, doc, updateDoc, getDoc } from "firebase/firestore";
+import { travelInfo } from '../utils/distancematrix'
+
+import { collection, query, where, onSnapshot, doc, updateDoc, getDoc } from "firebase/firestore"
 import { ref, set } from "firebase/database"
 import { firestore, database } from '../firebase'
 
 import { GOOGLE_API_KEY } from '@env'
 
-const BACKGROUND_FETCH_TASK = 'background-location-task';
+const BACKGROUND_FETCH_TASK = 'background-location-task'
 
 export default function HomeScreen() {
   const storageTheme = useSelector(selectTheme)
@@ -52,7 +54,8 @@ export default function HomeScreen() {
 
   const [directionsView, setDirectionsView] = useState(false)
   const [drivers, setDrivers] = useState([])
-  const [status, setStatus] = useState('done')
+  const [status, setStatus] = useState(orderToken ? orderInformation.status : 'done')
+  const [gif, setGif] = useState(false)
 
   const styles = StyleSheet.create({
     inputContainer: {
@@ -136,21 +139,25 @@ export default function HomeScreen() {
           setStatus(data.status)
 
           if (data.driver) {
-            const trackDriver = onSnapshot(doc(firestore, "drivers", data.driver), (doc) => {
-              dispatch(setDriver(doc.data()))
+            const trackDriver = onSnapshot(doc(firestore, "drivers", data.driver), async (item) => {
+              const travelInformation = await travelInfo(origin, item.data().location)
+
+              dispatch(setDriver({ ...item.data(), wait: travelInformation }))
             });
+          }
 
-            (async () => {
-              const docSnap = await getDoc(doc(firestore, "cars", driver.car))
+          if (data.status === 'arrived') {
+            setGif(true)
 
-              dispatch(setCar(docSnap.data()))
-            })()
+            setTimeout(() => {
+              setGif(false)
+            }, 60);
           }
 
           dispatch(setOrderInformation({
             status: data.status
           }))
-        },);
+        });
 
         registerBackgroundFetchAsync()
   
@@ -180,6 +187,16 @@ export default function HomeScreen() {
       setDirectionsView(false)
     }
   }, [status])
+
+  useEffect(() => {
+    if (driver) {
+      (async () => {
+        const docSnap = await getDoc(doc(firestore, "cars", driver?.car))
+    
+        dispatch(setCar(docSnap.data()))
+      })()
+    }
+  }, [driver])
 
   const updateUserLocation = async () => {
     const data = await Location.getCurrentPositionAsync({})
@@ -307,15 +324,13 @@ export default function HomeScreen() {
       }
 
       {
-        status === 'arrived' && (
+        gif && (
           <Image 
             source={require("../assets/confetti.gif")}
             style={{
               position: 'absolute',
               zIndex: 9999,
-              top: -60,
-              transform: [{rotate: '180deg'}],
-              height: '60%',
+              top: 354,
               width: '100%',
               resizeMode: 'contain'
             }}
@@ -335,7 +350,7 @@ export default function HomeScreen() {
         }
 
         {
-          driver && (
+          driver && orderToken && (
             <Marker
               identifier='driver'
               coordinate={{

@@ -39,7 +39,6 @@ export default function Map({ children, mapRef, origin, directionsView, userLoca
       onUserLocationChange={coordinate => userLocationChange(coordinate)}
       showsMyLocationButton={false}
       rotateEnabled={false}
-      pitchEnabled={false}
       mapType='mutedStandard'
       mapPadding={{
         top: insets.top,
