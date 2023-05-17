@@ -179,7 +179,7 @@ const ButtomSheet = ({ userToken, origin, pickUp, destination, orderToken, order
     } else {
       fromLatitude = origin.latitude
       fromLongitude = origin.longitude
-      fromAddress = await getFormattedAddress()
+      fromAddress = await getFormattedAddress({ latitude: origin.latitude, longitude: origin.longitude })
     }
 
     const docRef = await addDoc(collection(firestore, "calls"), {

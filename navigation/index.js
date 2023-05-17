@@ -62,6 +62,16 @@ function RootNavigator() {
             latitude: location.coords.latitude,
             longitude: location.coords.longitude
           }))
+
+          try {
+            const value = await AsyncStorage.getItem('theme')
+            
+            if (value !== null) {
+              dispatch(setTheme(value))
+            }
+          } catch(e) {
+            
+          }
   
           const docSnap = await getDoc(doc(firestore, "users", user.uid))
 
@@ -96,16 +106,6 @@ function RootNavigator() {
               }))
             }
           });
-
-          try {
-            const value = await AsyncStorage.getItem('theme')
-            
-            if (value !== null) {
-              dispatch(setTheme(value))
-            }
-          } catch(e) {
-
-          }
   
           dispatch(setUserToken(user.uid))
         } catch (error) {
