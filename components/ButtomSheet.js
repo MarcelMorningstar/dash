@@ -11,7 +11,7 @@ import Colors from "../constants/Colors";
 
 import { useSelector, useDispatch } from 'react-redux'
 import { setDestination, setPickUp } from "../slices/mainSlice";
-import { setOrderToken, setOrderInformation, setOrderType } from "../slices/orderSlice";
+import { setOrderToken, setOrderInformation, setOrderType, selectOrderAdditions, setOrderAdditions } from "../slices/orderSlice";
 import { selectTheme } from '../slices/authSlice'
 
 import { travelInfo } from "../utils/distancematrix";
@@ -25,6 +25,9 @@ import { GOOGLE_API_KEY } from '@env'
 
 const ButtomSheet = ({ userToken, origin, pickUp, destination, orderToken, orderType, orderInformation, drivers, driver, car, status, setStatus, cancelOrder, directionsView, setDirectionsView, fitDerection, fitUser }) => {
   const dispatch = useDispatch()
+
+  const orderAdditions = useSelector(selectOrderAdditions)
+
   const [fromAddress, setFromAddress] = useState('')
   const [destinationAddress, setDestinationAddress] = useState('')
 
@@ -33,7 +36,9 @@ const ButtomSheet = ({ userToken, origin, pickUp, destination, orderToken, order
   const circleScale1 = useRef(new Animated.Value(1)).current;
   const circleOpacity2 = useRef(new Animated.Value(0.4)).current;
   const circleScale2 = useRef(new Animated.Value(0.7)).current;
+
   const [cancel, setCancel] = useState(false)
+
   const storageTheme = useSelector(selectTheme)
   const [theme, setTheme] = useState(storageTheme === 'automatic' ? Appearance.getColorScheme() : storageTheme);
 
@@ -147,6 +152,23 @@ const ButtomSheet = ({ userToken, origin, pickUp, destination, orderToken, order
     ).start()
   }
 
+  const toggleOrderAdditions = (name) => {
+    let additions = orderAdditions.find(e => e === name)
+
+    if (additions) {
+      let index = orderAdditions.findIndex(e => e === name)
+      additions = [...orderAdditions]
+      additions.splice(index, 1);
+
+      dispatch(setOrderAdditions(additions))
+    } else {
+      additions = [...orderAdditions]
+      additions.push(name)
+
+      dispatch(setOrderAdditions(additions))
+    }
+  }
+
   const getDistance = (distance) => {
     return (distance / 1000).toFixed(2) || 0
   }
@@ -196,6 +218,7 @@ const ButtomSheet = ({ userToken, origin, pickUp, destination, orderToken, order
       },
       user: userToken,
       type: orderType,
+      additions: orderAdditions,
       status: 'in wait',
     });
 
@@ -348,17 +371,35 @@ const ButtomSheet = ({ userToken, origin, pickUp, destination, orderToken, order
               ) : directionsView ? (
                 <View style={[styles.container, { height: 175 }]}>
                   <View style={{ height: 64 }}>
-                    <ScrollView horizontal={true} showsHorizontalScrollIndicator={false}>
-                      <TouchableOpacity style={styles.carType} onPress={() => {}}>
-                        <Text>1</Text>
+                    <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+                      <TouchableOpacity style={[styles.carType, orderAdditions.find(e => e === 'babysit') ? { borderColor: Colors[theme]['primary'] } : { borderColor: 'gray' }]} onPress={() => toggleOrderAdditions('babysit')}>
+                        <Image
+                          source={require("../assets/luggage.png")}
+                          style={{
+                            height: '75%',
+                            resizeMode: 'contain'
+                          }}
+                        />
                       </TouchableOpacity>
-                      <TouchableOpacity style={styles.carType} onPress={() => {}}>
-                        <Text>2</Text>
+                      <TouchableOpacity style={[styles.carType, orderAdditions.find(e => e === 'luggage') ? { borderColor: Colors[theme]['primary'] } : { borderColor: 'gray' }]} onPress={() => toggleOrderAdditions('luggage')}>
+                        <Image
+                          source={require("../assets/baby-car-seat.png")}
+                          style={{
+                            height: '75%',
+                            resizeMode: 'contain'
+                          }}
+                        />
                       </TouchableOpacity>
-                      <TouchableOpacity style={styles.carType} onPress={() => {}}>
-                        <Text>3</Text>
+                      <TouchableOpacity style={[styles.carType, orderAdditions.find(e => e === 'invalid') ? { borderColor: Colors[theme]['primary'] } : { borderColor: 'gray' }]} onPress={() => toggleOrderAdditions('invalid')}>
+                        <Image
+                          source={require("../assets/invalid.png")}
+                          style={{
+                            height: '75%',
+                            resizeMode: 'contain'
+                          }}
+                        />
                       </TouchableOpacity>
-                    </ScrollView>
+                    </View>
                   </View>
         
                   <View style={[styles.row, { justifyContent: 'space-between', alignItems: 'center' }]}>
@@ -558,12 +599,12 @@ const styles = StyleSheet.create({
     borderRadius: 12
   },
   carType: {
-    width: 120, 
+    width: "31%", 
     height: 64, 
-    marginHorizontal: 5,
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: 'gray',
+    borderWidth: 2,
     borderRadius: 12
   },
   button: {
