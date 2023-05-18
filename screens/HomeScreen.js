@@ -19,7 +19,7 @@ import Colors from '../constants/Colors'
 import { useSelector, useDispatch } from 'react-redux'
 import { selectDestination, selectOrigin, selectPickUp, setDestination, setOrigin, setPickUp } from '../slices/mainSlice'
 import { selectUserInfo, selectUserToken, selectTheme } from '../slices/authSlice'
-import { selectCar, selectDriver, selectOrderInformation, selectOrderToken, selectOrderType, setCar, setDriver, setOrderInformation, setOrderToken, setOrderType } from '../slices/orderSlice'
+import { selectCar, selectDriver, selectOrderInformation, selectOrderToken, selectOrderType, setCar, setDriver, setOrderAdditions, setOrderInformation, setOrderToken, setOrderType } from '../slices/orderSlice'
 
 import { travelInfo, getDistance } from '../utils/distancematrix'
 
@@ -175,6 +175,7 @@ export default function HomeScreen() {
         dispatch(setPickUp(null))
         dispatch(setOrderToken(null))
         dispatch(setOrderType('taxi'))
+        dispatch(setOrderAdditions([]))
         dispatch(setOrderInformation(null))
         dispatch(setDriver(null))
         dispatch(setCar(null))

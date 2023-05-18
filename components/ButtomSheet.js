@@ -426,7 +426,8 @@ const ButtomSheet = ({ userToken, origin, pickUp, destination, orderToken, order
                       onPress={() => {
                         dispatch(setDestination(null))
                         dispatch(setPickUp(null))
-
+                        dispatch(setOrderAdditions([]))
+                        
                         setDirectionsView(false)
 
                         handleSnapPress(3)
