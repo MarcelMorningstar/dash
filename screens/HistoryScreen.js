@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react'
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { FlatList } from 'react-native'
 
 import Layout from '../components/Layout'
@@ -20,8 +21,18 @@ export default function HistoryScreen({ navigation }) {
   }, [])
 
   const readUserHistory = async (userToken) => {
+    let date = null
+
+    try {
+      date = await AsyncStorage.getItem('history')
+      date = new Date(date)
+      console.log(date)
+    } catch(e) {
+
+    }
+
     let data = []
-    const q = query(collection(firestore, "calls"), where("user", "==", userToken), where("status", "==", 'done'))
+    const q = date ? query(collection(firestore, "calls"), where("user", "==", userToken), where("status", "==", 'done'), where("finished_at", ">", date)) : query(collection(firestore, "calls"), where("user", "==", userToken), where("status", "==", 'done'))
     const querySnapshot = await getDocs(q)
 
     querySnapshot.forEach((doc) => {

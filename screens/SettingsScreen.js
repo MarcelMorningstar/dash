@@ -18,6 +18,7 @@ export default function SettingsScreen({ navigation }) {
   const [themeForm, setThemeForm] = useState(false)
   const [tempTheme, setTempTheme] = useState(theme)
   const [logout, setLogout] = useState(false)
+  const [clear, setClear] = useState(false)
 
   const setStorageTheme = async (value) => {
     try {
@@ -28,11 +29,21 @@ export default function SettingsScreen({ navigation }) {
     }
   }
 
+  const clearRideHistory = async () => {
+    try {
+      const date = (new Date()).toString()
+
+      await AsyncStorage.setItem('history', date)
+    } catch(e) {
+
+    }
+  }
+
   return (
     <Layout title='Settings' navigation={navigation} backScreen='Home'>
       <ScrollView>
         <SettingsSection title='Preferences'>
-          <TouchableHighlight 
+          {/* <TouchableHighlight 
             activeOpacity={0.6}
             style={styles.option}
             onPress={() => {}}
@@ -44,7 +55,7 @@ export default function SettingsScreen({ navigation }) {
               </View>
               <Text style={styles.optionText}>Value</Text>
             </View>
-          </TouchableHighlight>
+          </TouchableHighlight> */}
 
           <TouchableHighlight 
             activeOpacity={0.6}
@@ -132,11 +143,32 @@ export default function SettingsScreen({ navigation }) {
           <TouchableHighlight 
             activeOpacity={0.6}
             style={styles.option}
-            onPress={() => {}}
+            onPress={() => setClear(true)}
           >
             <View style={styles.optionLabel}>
               <FontAwesome5 name="history" size={24} style={styles.optionIcon} />
               <Text style={styles.optionText}>Clear Ride History</Text>
+              <Overlay visible={clear}>
+                <SecondaryView style={styles.modalView}>
+                  <Text style={{ marginBottom: 2, textAlign: 'center', fontSize: 21, fontWeight: '500' }}>History clean up</Text>
+                  <Text style={{ marginVertical: 8, textAlign: 'center', fontSize: 14 }}>Are you sure want to clear your history?</Text>
+
+                  <View style={{ display: 'flex', flexDirection: 'row' }}>
+                    <TouchableOpacity
+                      style={[styles.button, { marginRight: 4, backgroundColor: '#ED4337' }]}
+                      onPress={() => { clearRideHistory(); setClear(false) }}
+                    >
+                      <Text style={{ color: 'white', fontWeight: '500' }}>Yes</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      style={[styles.button, { marginLeft: 4, backgroundColor: '#F0F0F0' }]}
+                      onPress={() => setClear(false)}
+                    >
+                      <Text style={{ color: 'black', fontWeight: '500' }}>No</Text>
+                    </TouchableOpacity>
+                  </View>
+                </SecondaryView>
+            </Overlay>
             </View>
           </TouchableHighlight>
 
