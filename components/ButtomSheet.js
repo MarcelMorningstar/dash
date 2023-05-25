@@ -10,7 +10,7 @@ import Overlay from "./Overlay";
 import Colors from "../constants/Colors";
 
 import { useSelector, useDispatch } from 'react-redux'
-import { setDestination, setPickUp } from "../slices/mainSlice";
+import { selectPrices, setDestination, setPickUp } from "../slices/mainSlice";
 import { setOrderToken, setOrderInformation, setOrderType, selectOrderAdditions, setOrderAdditions } from "../slices/orderSlice";
 import { selectTheme } from '../slices/authSlice'
 
@@ -27,9 +27,12 @@ const ButtomSheet = ({ userToken, origin, pickUp, destination, orderToken, order
   const dispatch = useDispatch()
 
   const orderAdditions = useSelector(selectOrderAdditions)
+  const prices = useSelector(selectPrices)
 
   const [fromAddress, setFromAddress] = useState('')
+  const [from, setFrom] = useState(null)
   const [destinationAddress, setDestinationAddress] = useState('')
+  const [price, setPrice] = useState(0)
 
   const sheetHeight = useRef(new Animated.Value(0)).current;
   const circleOpacity1 = useRef(new Animated.Value(1)).current;
@@ -167,6 +170,17 @@ const ButtomSheet = ({ userToken, origin, pickUp, destination, orderToken, order
 
       dispatch(setOrderAdditions(additions))
     }
+  }
+
+  const countPrice = async (origin, destination) => {
+    let travelInformation = await travelInfo(from ? from : origin, destination)
+
+    let total = 0
+    total = parseFloat(total) + parseFloat(prices[2])
+    total = parseFloat(total) + (parseFloat(prices[0]) * parseFloat((travelInformation.distance.value / 1000).toFixed(2)))
+    total = parseFloat(total) + (parseFloat(prices[1]) * parseFloat((travelInformation.duration.value / 60).toFixed(2)))
+
+    setPrice(total.toFixed(2))
   }
 
   const getDistance = (distance) => {
@@ -408,7 +422,7 @@ const ButtomSheet = ({ userToken, origin, pickUp, destination, orderToken, order
                       <Text style={{ fontSize: 18 }}>Cash</Text>
                     </View>
 
-                    <Text style={{ fontSize: 18, fontWeight: '500' }}>12.60€</Text>
+                    <Text style={{ fontSize: 18, fontWeight: '500' }}>{ price }€</Text>
                   </View>
 
                   <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
@@ -427,7 +441,7 @@ const ButtomSheet = ({ userToken, origin, pickUp, destination, orderToken, order
                         dispatch(setDestination(null))
                         dispatch(setPickUp(null))
                         dispatch(setOrderAdditions([]))
-                        
+
                         setDirectionsView(false)
 
                         handleSnapPress(3)
@@ -483,6 +497,8 @@ const ButtomSheet = ({ userToken, origin, pickUp, destination, orderToken, order
                           longitude: details.geometry.location.lng,
                           address: details.formatted_address
                         }))
+
+                        setFrom({ latitude: details.geometry.location.lat, longitude: details.geometry.location.lng })
                       }}
                       minLength={2}
                       styles={{
@@ -534,6 +550,8 @@ const ButtomSheet = ({ userToken, origin, pickUp, destination, orderToken, order
                           longitude: details.geometry.location.lng,
                           address: details.formatted_address
                         }))
+
+                        countPrice(origin, { latitude: details.geometry.location.lat, longitude: details.geometry.location.lng })
           
                         setDirectionsView(true)
 

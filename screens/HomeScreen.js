@@ -17,7 +17,7 @@ import FirstTimeForm from '../components/FirstTimeForm'
 import Colors from '../constants/Colors'
 
 import { useSelector, useDispatch } from 'react-redux'
-import { selectDestination, selectOrigin, selectPickUp, setDestination, setOrigin, setPickUp } from '../slices/mainSlice'
+import { selectDestination, selectOrigin, selectPickUp, setDestination, setOrigin, setPickUp, setPrices } from '../slices/mainSlice'
 import { selectUserInfo, selectUserToken, selectTheme } from '../slices/authSlice'
 import { selectCar, selectDriver, selectOrderInformation, selectOrderToken, selectOrderType, setCar, setDriver, setOrderAdditions, setOrderInformation, setOrderToken, setOrderType } from '../slices/orderSlice'
 
@@ -112,17 +112,31 @@ export default function HomeScreen() {
 
     const driverUnsubscribe = onSnapshot(q, (querySnapshot) => {
       const temp = [];
+      let count = 0;
+      let prices = [0, 0, 0];
 
       querySnapshot.forEach((doc) => {
         if (getDistance(origin.latitude, doc.data().location.latitude, origin.longitude, doc.data().location.longitude) < 10) {
+          count++;
+
           temp.push({
             id: doc.id,
             ...doc.data()
           });
+
+          prices[0] = parseFloat(prices[0]) + parseFloat(doc.data().services.taxi.values[0])
+          prices[1] = parseFloat(prices[1]) + parseFloat(doc.data().services.taxi.values[1])
+          prices[2] = parseFloat(prices[2]) + parseFloat(doc.data().services.taxi.values[2])
+
+          prices[0] = parseFloat((prices[0] / count).toFixed(2))
+          prices[1] = parseFloat((prices[1] / count).toFixed(2))
+          prices[2] = parseFloat((prices[2] / count).toFixed(2))
         }
       })
 
-      setDrivers(temp)
+      dispatch(setPrices(prices))
+
+      setDrivers(temp);
     });
 
     return () => {
