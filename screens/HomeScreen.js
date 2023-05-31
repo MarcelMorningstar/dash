@@ -165,7 +165,7 @@ export default function HomeScreen() {
 
             setTimeout(() => {
               setGif(false)
-            }, 60);
+            }, 900);
           }
 
           dispatch(setOrderInformation({

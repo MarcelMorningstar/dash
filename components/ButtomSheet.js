@@ -386,7 +386,7 @@ const ButtomSheet = ({ userToken, origin, pickUp, destination, orderToken, order
                 <View style={[styles.container, { height: 175 }]}>
                   <View style={{ height: 64 }}>
                     <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-                      <TouchableOpacity style={[styles.carType, orderAdditions.find(e => e === 'babysit') ? { borderColor: Colors[theme]['primary'] } : { borderColor: 'gray' }]} onPress={() => toggleOrderAdditions('babysit')}>
+                      <TouchableOpacity style={[styles.carType, orderAdditions.find(e => e === 'luggage') ? { borderColor: Colors[theme]['primary'] } : { borderColor: 'gray' }]} onPress={() => toggleOrderAdditions('luggage')}>
                         <Image
                           source={require("../assets/luggage.png")}
                           style={{
@@ -395,7 +395,7 @@ const ButtomSheet = ({ userToken, origin, pickUp, destination, orderToken, order
                           }}
                         />
                       </TouchableOpacity>
-                      <TouchableOpacity style={[styles.carType, orderAdditions.find(e => e === 'luggage') ? { borderColor: Colors[theme]['primary'] } : { borderColor: 'gray' }]} onPress={() => toggleOrderAdditions('luggage')}>
+                      <TouchableOpacity style={[styles.carType, orderAdditions.find(e => e === 'babysit') ? { borderColor: Colors[theme]['primary'] } : { borderColor: 'gray' }]} onPress={() => toggleOrderAdditions('babysit')}>
                         <Image
                           source={require("../assets/baby-car-seat.png")}
                           style={{

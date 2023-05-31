@@ -26,7 +26,6 @@ export default function HistoryScreen({ navigation }) {
     try {
       date = await AsyncStorage.getItem('history')
       date = new Date(date)
-      console.log(date)
     } catch(e) {
 
     }
