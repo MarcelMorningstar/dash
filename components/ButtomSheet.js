@@ -203,7 +203,7 @@ const ButtomSheet = ({ userToken, origin, pickUp, destination, orderToken, order
   }
 
   const createCall = async () => {
-    let travelInformation = await travelInfo(origin, destination)
+    let travelInformation
     let fromLatitude
     let fromLongitude
     let fromAddress
@@ -212,10 +212,12 @@ const ButtomSheet = ({ userToken, origin, pickUp, destination, orderToken, order
       fromLatitude = pickUp.latitude
       fromLongitude = pickUp.longitude
       fromAddress = pickUp.address
+      travelInformation = await travelInfo({ latitude: pickUp.latitude, longitude: pickUp.longitude }, destination)
     } else {
       fromLatitude = origin.latitude
       fromLongitude = origin.longitude
       fromAddress = await getFormattedAddress({ latitude: origin.latitude, longitude: origin.longitude })
+      travelInformation = await travelInfo(origin, destination)
     }
 
     const docRef = await addDoc(collection(firestore, "calls"), {
@@ -422,7 +424,7 @@ const ButtomSheet = ({ userToken, origin, pickUp, destination, orderToken, order
                       <Text style={{ fontSize: 18 }}>Cash</Text>
                     </View>
 
-                    <Text style={{ fontSize: 18, fontWeight: '500' }}>{ price }€</Text>
+                    <Text style={{ fontSize: 18, fontWeight: '500' }}>~{ price }€</Text>
                   </View>
 
                   <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
