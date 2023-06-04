@@ -1,5 +1,5 @@
 import React, { useState} from 'react'
-import { StyleSheet, TouchableWithoutFeedback, View} from 'react-native'
+import { Image, StyleSheet, TouchableWithoutFeedback, View} from 'react-native'
 import { SecondaryView, Text } from './Themed';
 import Moment from 'moment';
 
@@ -52,7 +52,15 @@ export default function HistoryItem({ item, selectedId, setSelectedId }) {
                 <View style={styles.column}>
                     <View style={[styles.row, styles.item]}>
                         <View style={[styles.row, {maxWidth: '66%'}]}>
-                            <View style={styles.picContainer}></View>
+                            <View style={styles.picContainer}>
+                                <Image
+                                    source={ item.type == "taxi" ? require("../assets/taxi.png") : require("../assets/driver.png") }
+                                    style={{
+                                        width: '69%',
+                                        resizeMode: 'contain'
+                                    }}
+                                />
+                            </View>
                         
                             <View>
                                 <View style={[styles.row, { flexWrap: 'wrap', alignItems: 'center' }]}>
@@ -94,6 +102,8 @@ const styles = StyleSheet.create({
         width: '100%'
     },
     picContainer: {
+        alignItems: 'center',
+        justifyContent: 'center',
         width: 48, 
         height: 48, 
         marginHorizontal: 8, 
