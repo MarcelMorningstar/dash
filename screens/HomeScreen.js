@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react'
-import { Appearance, Image, PixelRatio, Platform, StyleSheet, View } from 'react-native'
-import { TouchableHighlight } from '../components/Themed'
+import { Appearance, Image, PixelRatio, Platform, StyleSheet, TouchableOpacity, View } from 'react-native'
+import { SecondaryView, Text, TouchableHighlight } from '../components/Themed'
 import * as BackgroundFetch from 'expo-background-fetch'
 import * as TaskManager from 'expo-task-manager'
 import * as Location from 'expo-location'
@@ -13,6 +13,7 @@ import Map from '../components/Map'
 import DriverMarker from '../components/DriverMarker'
 import ButtomSheet from '../components/ButtomSheet'
 import FirstTimeForm from '../components/FirstTimeForm'
+import Overlay from '../components/Overlay'
 
 import Colors from '../constants/Colors'
 
@@ -56,6 +57,7 @@ export default function HomeScreen() {
   const [drivers, setDrivers] = useState([])
   const [status, setStatus] = useState(orderToken ? orderInformation.status : 'done')
   const [gif, setGif] = useState(false)
+  const [pay, setPay] = useState(false)
 
   const styles = StyleSheet.create({
     inputContainer: {
@@ -90,6 +92,24 @@ export default function HomeScreen() {
       elevation: 7,
       shadowOffset: { width: 0, height: 0 },
       shadowOpacity: 0.25
+    },
+    modalView: {
+      paddingHorizontal: 20,
+      paddingTop: 20,
+      paddingBottom: 12,
+      borderRadius: 21,
+      shadowOffset: { width: 0, height: 0 },
+      shadowOpacity: 0.25,
+      shadowRadius: 4,
+      elevation: 5,
+    },
+    buttons: {
+      flex: 1,
+      alignItems: 'center',
+      justifyContent: 'center',
+      paddingVertical: 8,
+      paddingHorizontal: 12,
+      borderRadius: 16
     }
   })
 
@@ -166,6 +186,14 @@ export default function HomeScreen() {
             setTimeout(() => {
               setGif(false)
             }, 900);
+          }
+
+          if (data.status === 'pay') {
+            dispatch(setOrderInformation({
+              price: data.price
+            }))
+
+            setPay(true)
           }
 
           dispatch(setOrderInformation({
@@ -305,7 +333,7 @@ export default function HomeScreen() {
   return (
     <View behavior={Platform.OS === "ios" ? "padding" : "height"} style={{ flex: 1 }}>
       {
-        (driver && orderToken && (status === 'waiting driver' || status === 'arrived')) && (
+        (driver && orderToken && (status == 'waiting driver' || status == 'arrived')) && (
           <TouchableHighlight
             activeOpacity={0.6}
             style={[styles.centerBtn, { right: 76, }]}
@@ -353,7 +381,7 @@ export default function HomeScreen() {
       
       <Map mapRef={mapRef} origin={origin} directionsView={directionsView} userLocationChange={userLocationChange} insets={insets}>
         {
-          !directionsView && (
+          (!directionsView && (status == 'done')) && (
             drivers.map(item => {
               return (
                 <DriverMarker key={item.id} driver={item} userInfo={userInfo} />
@@ -363,7 +391,7 @@ export default function HomeScreen() {
         }
 
         {
-          driver && orderToken && (
+          (driver && orderToken && status == "waiting driver") && (
             <Marker
               identifier='driver'
               coordinate={{
@@ -432,6 +460,22 @@ export default function HomeScreen() {
         fitDerection={fitDerection}
         fitUser={fitUser}
       />
+
+      <Overlay visible={pay}>
+        <SecondaryView style={styles.modalView}>
+          <Text style={{ marginBottom: 2, textAlign: 'center', fontSize: 21, fontWeight: '500' }}>Payment</Text>
+          <Text style={{ marginVertical: 8, textAlign: 'center', fontSize: 14 }}>Your drive value is { orderInformation?.price }€</Text>
+
+          <View style={{ display: 'flex', flexDirection: 'row' }}>
+            <TouchableOpacity
+              style={[styles.buttons, { marginLeft: 4, backgroundColor: '#F0F0F0' }]}
+              onPress={() => { setPay(false); }}
+            >
+              <Text style={{ color: 'black', fontWeight: '500' }}>Confirm</Text>
+            </TouchableOpacity>
+          </View>
+        </SecondaryView>
+      </Overlay>
 
       { Object.keys(userInfo).length === 0 && <FirstTimeForm userToken={userToken} /> }
     </View>

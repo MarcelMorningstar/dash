@@ -81,7 +81,7 @@ const ButtomSheet = ({ userToken, origin, pickUp, destination, orderToken, order
   useEffect(() => {
     if (status == 'done') {
       handleSnapPress(1)
-    } else if (status == 'in progress') {
+    } else if (status == 'in progress' || status == 'pay') {
       handleSnapPress(0)
     } else if (status == 'in wait' || status == 'waiting driver' || status == 'arrived') {
       handleSnapPress(2)
@@ -261,7 +261,7 @@ const ButtomSheet = ({ userToken, origin, pickUp, destination, orderToken, order
       <Animated.View style={{ height: sheetHeight }}>
         <BottomSheetModal
           ref={bottomSheetModalRef}
-          index={status == 'done' ? 1 : status == 'in progress' ? 0 : 2}
+          index={status == 'done' ? 1 : (status == 'in progress' || status == 'pay') ? 0 : 2}
           snapPoints={snapPoints}
           onChange={handleSheetChanges}
           backgroundStyle={{ backgroundColor: Colors[theme]['background'] }}
@@ -467,7 +467,7 @@ const ButtomSheet = ({ userToken, origin, pickUp, destination, orderToken, order
                         }}
                       />
                     </TouchableOpacity>
-                    <TouchableOpacity style={[styles.type, orderType === 'second driver' ? { backgroundColor: 'gray' } : { backgroundColor: 'lightgray' } ]} onPress={() => { dispatch(setOrderType('second driver')); handleSnapPress(3) }}>
+                    <TouchableOpacity style={[styles.type, orderType === 'secondDriver' ? { backgroundColor: 'gray' } : { backgroundColor: 'lightgray' } ]} onPress={() => { dispatch(setOrderType('secondDriver')); handleSnapPress(3) }}>
                       <Image
                         source={require("../assets/driver.png")}
                         style={{
